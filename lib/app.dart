@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'login_screen.dart';
 
 class App extends StatelessWidget {
   @override
@@ -6,20 +7,10 @@ class App extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: "TitilliumWeb",
+        fontFamily: "TitilliumWebReg",
         textTheme: Theme.of(context).textTheme,
       ),
-      home: Scaffold(
-        body: Center(
-          child: Text(
-            "The Font is working!",
-            style: TextStyle(
-              fontSize: 40,
-              // fontFamily: "Nunito",
-            ),
-          ),
-        ),
-      ),
+      home: LoginScreen(),
     );
   }
 }
