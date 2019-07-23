@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/home_screen.dart';
 
 class App extends StatelessWidget {
   @override
@@ -10,7 +11,7 @@ class App extends StatelessWidget {
         fontFamily: "TitilliumWebReg",
         textTheme: Theme.of(context).textTheme,
       ),
-      home: LoginScreen(),
+      home: HomeScreen(),
     );
   }
 }

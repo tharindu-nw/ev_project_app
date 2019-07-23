@@ -5,7 +5,7 @@ import 'package:ev_app/utils/bubble_indication_painter.dart';
 import 'package:flutter/services.dart';
 
 final _padding = EdgeInsets.only(top: 20.0);
-final _bigPadding = EdgeInsets.fromLTRB(0.0, 75.0, 0.0, 0.0);
+final _bigPadding = EdgeInsets.fromLTRB(0.0, 60.0, 0.0, 0.0);
 
 class LoginScreen extends StatefulWidget {
   _LoginScreenState createState() => new _LoginScreenState();
@@ -204,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               size: 22.0,
                               color: Colors.black,
                             ),
-                            hintText: "Email Address",
+                            hintText: "Password",
                             hintStyle: TextStyle(
                               fontFamily: "TitilliumWebBold",
                               fontSize: 16,
@@ -377,7 +377,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildSignUp(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(top: 23.0),
+      padding: EdgeInsets.fromLTRB(0, 23.0, 0, 15.0),
       child: Column(
         children: <Widget>[
           Stack(
@@ -392,21 +392,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 child: Container(
                   width: 300.0,
-                  height: 360.0,
+                  height: 320.0,
                   child: Column(
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 15.0, bottom: 15.0, left: 25.0, right: 25.0),
                         child: TextField(
                           focusNode: myFocusNodeName,
                           controller: signupNameController,
                           keyboardType: TextInputType.text,
                           textCapitalization: TextCapitalization.words,
-                          style: TextStyle(
-                              fontFamily: "WorkSansSemiBold",
-                              fontSize: 16.0,
-                              color: Colors.black),
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
@@ -415,7 +412,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             hintText: "Name",
                             hintStyle: TextStyle(
-                                fontFamily: "WorkSansSemiBold", fontSize: 16.0),
+                              fontSize: 16.0,
+                              fontFamily: "TitilliumWebBold",
+                            ),
                           ),
                         ),
                       ),
@@ -426,15 +425,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 15.0, bottom: 15.0, left: 25.0, right: 25.0),
                         child: TextField(
                           focusNode: myFocusNodeEmail,
                           controller: signupEmailController,
                           keyboardType: TextInputType.emailAddress,
                           style: TextStyle(
-                              fontFamily: "WorkSansSemiBold",
-                              fontSize: 16.0,
-                              color: Colors.black),
+                            fontSize: 16.0,
+                            color: Colors.black,
+                          ),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
@@ -443,7 +442,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             hintText: "Email Address",
                             hintStyle: TextStyle(
-                                fontFamily: "WorkSansSemiBold", fontSize: 16.0),
+                              fontSize: 16.0,
+                              fontFamily: "TitilliumWebBold",
+                            ),
                           ),
                         ),
                       ),
@@ -454,15 +455,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 15.0, bottom: 15.0, left: 25.0, right: 25.0),
                         child: TextField(
                           focusNode: myFocusNodePassword,
                           controller: signupPasswordController,
                           obscureText: _obscureTextSignup,
                           style: TextStyle(
-                              fontFamily: "WorkSansSemiBold",
-                              fontSize: 16.0,
-                              color: Colors.black),
+                            fontSize: 16.0,
+                            color: Colors.black,
+                          ),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
@@ -471,7 +472,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             hintText: "Password",
                             hintStyle: TextStyle(
-                                fontFamily: "WorkSansSemiBold", fontSize: 16.0),
+                              fontSize: 16.0,
+                              fontFamily: "TitilliumWebBold",
+                            ),
                             suffixIcon: GestureDetector(
                               onTap: _toggleSignup,
                               child: Icon(
@@ -492,23 +495,25 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                            top: 20.0, bottom: 20.0, left: 25.0, right: 25.0),
+                            top: 15.0, bottom: 15.0, left: 25.0, right: 25.0),
                         child: TextField(
                           controller: signupConfirmPasswordController,
                           obscureText: _obscureTextSignupConfirm,
                           style: TextStyle(
-                              fontFamily: "WorkSansSemiBold",
-                              fontSize: 16.0,
-                              color: Colors.black),
+                            fontSize: 16.0,
+                            color: Colors.black,
+                          ),
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             icon: Icon(
                               FontAwesomeIcons.lock,
                               color: Colors.black,
                             ),
-                            hintText: "Confirmation",
+                            hintText: "Confirm Password",
                             hintStyle: TextStyle(
-                                fontFamily: "WorkSansSemiBold", fontSize: 16.0),
+                              fontSize: 16.0,
+                              fontFamily: "TitilliumWebBold",
+                            ),
                             suffixIcon: GestureDetector(
                               onTap: _toggleSignupConfirm,
                               child: Icon(
@@ -527,7 +532,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 340.0),
+                margin: EdgeInsets.only(top: 310.0),
                 decoration: new BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   boxShadow: <BoxShadow>[
@@ -544,8 +549,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                   gradient: new LinearGradient(
                       colors: [
+                        CT.ColorTheme.loginGradientStart,
                         CT.ColorTheme.loginGradientEnd,
-                        CT.ColorTheme.loginGradientStart
                       ],
                       begin: const FractionalOffset(0.2, 0.2),
                       end: const FractionalOffset(1.0, 1.0),
@@ -562,9 +567,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         "SIGN UP",
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25.0,
-                            fontFamily: "WorkSansBold"),
+                          color: Colors.white,
+                          fontSize: 25.0,
+                          fontFamily: "TitilliumWebBold",
+                        ),
                       ),
                     ),
                     onPressed: () {}
@@ -617,9 +623,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Text(
                   "Existing",
                   style: TextStyle(
-                      color: left,
-                      fontSize: 16.0,
-                      fontFamily: "WorkSansSemiBold"),
+                    color: left,
+                    fontSize: 16.0,
+                    fontFamily: "TitilliumWebBold",
+                  ),
                 ),
               ),
             ),
@@ -632,9 +639,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Text(
                   "New",
                   style: TextStyle(
-                      color: right,
-                      fontSize: 16.0,
-                      fontFamily: "WorkSansSemiBold"),
+                    color: right,
+                    fontSize: 16.0,
+                    fontFamily: "TitilliumWebBold",
+                  ),
                 ),
               ),
             ),
