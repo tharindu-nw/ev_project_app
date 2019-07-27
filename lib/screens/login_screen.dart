@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 decoration: BoxDecoration(
-                  gradient: CT.ColorTheme.gradient,
+                  gradient: CT.ColorTheme.loginGradient,
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
@@ -230,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 margin: EdgeInsets.only(top: 210.0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5.0),
-                  gradient: CT.ColorTheme.gradient,
+                  gradient: CT.ColorTheme.loginGradient,
                   boxShadow: <BoxShadow>[
                     BoxShadow(
                       color: CT.ColorTheme.loginGradientStart,

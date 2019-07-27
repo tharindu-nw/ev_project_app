@@ -50,6 +50,12 @@ flutter:
   assets:
     - assets/img/bicycle.png
     - assets/img/bicycle_icon.png
+    - assets/img/bg.jpg
+    - assets/img/triangle_left.png
+    - assets/img/triangle_inv_left.png
+    - assets/img/triangle_right.png
+    - assets/img/triangle_inv_right.png
+    - assets/img/circle.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

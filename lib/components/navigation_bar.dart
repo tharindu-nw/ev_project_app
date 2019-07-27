@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:ev_app/style/color_theme.dart';
 import 'navigation_bar_item.dart';
 
 // ignore: must_be_immutable
@@ -20,7 +20,7 @@ class TitledBottomNavigationBar extends StatefulWidget {
     this.curve = Curves.linear,
     // @required this.onTap,
     @required this.items,
-    this.activeColor = const Color(0xFF33938C),
+    this.activeColor = const Color(0xFF090446),
     this.inactiveColor,
     this.indicatorColor,
     this.initialIndex = 0,
@@ -38,7 +38,7 @@ class TitledBottomNavigationBar extends StatefulWidget {
 
 class _TitledBottomNavigationBarState extends State<TitledBottomNavigationBar>
     with SingleTickerProviderStateMixin {
-  static const double BAR_HEIGHT = 80;
+  static const double BAR_HEIGHT = 60;
   static const double INDICATOR_HEIGHT = 4;
 
   bool get reverse => widget.reverse;
@@ -47,7 +47,7 @@ class _TitledBottomNavigationBarState extends State<TitledBottomNavigationBar>
 
   double width = 0;
   Color activeColor;
-  Duration duration = Duration(milliseconds: 250);
+  Duration duration = Duration(milliseconds: 180);
 
   @override
   void initState() {
