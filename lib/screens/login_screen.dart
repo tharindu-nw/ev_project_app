@@ -1,10 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ev_app/utils/bubble_indication_painter.dart';
 import 'package:flutter/services.dart';
 
-final _padding = EdgeInsets.only(top: 20.0);
 final _bigPadding = EdgeInsets.fromLTRB(0.0, 60.0, 0.0, 0.0);
 
 class LoginScreen extends StatefulWidget {
@@ -230,15 +230,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 margin: EdgeInsets.only(top: 210.0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5.0),
-                  gradient: CT.ColorTheme.loginGradient,
+                  color: Colors.black,
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: CT.ColorTheme.loginGradientStart,
-                      offset: Offset(1.0, 6.0),
-                      blurRadius: 20.0,
-                    ),
-                    BoxShadow(
-                      color: CT.ColorTheme.loginGradientEnd,
+                      color: Colors.black87,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
@@ -249,7 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   splashColor: CT.ColorTheme.loginGradientStart,
                   child: Padding(
                     padding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 42.0),
+                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 35.0),
                     child: Text(
                       "LOGIN",
                       style: TextStyle(
@@ -535,27 +530,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 margin: EdgeInsets.only(top: 310.0),
                 decoration: new BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  color: Colors.black,
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: CT.ColorTheme.loginGradientStart,
-                      offset: Offset(1.0, 6.0),
-                      blurRadius: 20.0,
-                    ),
-                    BoxShadow(
-                      color: CT.ColorTheme.loginGradientEnd,
+                      color: Colors.black87,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                   ],
-                  gradient: new LinearGradient(
-                      colors: [
-                        CT.ColorTheme.loginGradientStart,
-                        CT.ColorTheme.loginGradientEnd,
-                      ],
-                      begin: const FractionalOffset(0.2, 0.2),
-                      end: const FractionalOffset(1.0, 1.0),
-                      stops: [0.0, 1.0],
-                      tileMode: TileMode.clamp),
                 ),
                 child: MaterialButton(
                     highlightColor: Colors.transparent,
@@ -563,7 +545,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 42.0),
+                          vertical: 8.0, horizontal: 35.0),
                       child: Text(
                         "SIGN UP",
                         style: TextStyle(

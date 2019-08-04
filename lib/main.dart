@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
-import 'app.dart';
+import 'routes.dart';
 
-void main() => runApp(App());
+void main() {
+  new Routes();
+}

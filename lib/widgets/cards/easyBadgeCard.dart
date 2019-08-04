@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ev_app/style/color_theme.dart' as CT;
 
 class EasyBadgeCard extends StatelessWidget {
   final Function onTap;
@@ -36,40 +37,50 @@ class EasyBadgeCard extends StatelessWidget {
       child: InkWell(
         onTap: this.onTap,
         child: Card(
+          elevation: 10.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
           color: (this.backgroundColor != null)
               ? this.backgroundColor
               : Colors.white,
           margin: const EdgeInsets.all(10.0),
           child: Row(
             children: <Widget>[
-              (this.leftBadge != null)
-                  ? Container(
-                      width: (this.backgroundColor != null) ? 80.0 : 100.0,
-                      height: 60.0,
-                      color: this.leftBadge,
-                      alignment: Alignment.topRight,
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 1,
-                            child: (this.prefixIcon != null)
-                                ? Icon(
-                                    this.prefixIcon,
-                                    color: this.prefixIconColor,
+              ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15.0),
+                  bottomLeft: Radius.circular(15.0),
+                ),
+                child: (this.leftBadge != null)
+                    ? Container(
+                        width: (this.backgroundColor != null) ? 80.0 : 100.0,
+                        height: 60.0,
+                        color: this.leftBadge,
+                        alignment: Alignment.topRight,
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              flex: 1,
+                              child: (this.prefixIcon != null)
+                                  ? Icon(
+                                      this.prefixIcon,
+                                      color: this.prefixIconColor,
+                                    )
+                                  : Container(),
+                            ),
+                            (this.backgroundColor == null && leftBadge != null)
+                                ? Image(
+                                    height: 60.0,
+                                    image: AssetImage(
+                                        "assets/img/triangle_left.png"),
                                   )
                                 : Container(),
-                          ),
-                          (this.backgroundColor == null && leftBadge != null)
-                              ? Image(
-                                  height: 60.0,
-                                  image: AssetImage(
-                                      "assets/img/triangle_left.png"),
-                                )
-                              : Container(),
-                        ],
-                      ),
-                    )
-                  : Container(),
+                          ],
+                        ),
+                      )
+                    : Container(),
+              ),
               (this.backgroundColor != null && leftBadge != null)
                   ? Image.asset(
                       "assets/img/triangle_inv_left.png",
@@ -91,8 +102,8 @@ class EasyBadgeCard extends StatelessWidget {
                                     color: (this.titleColor != null)
                                         ? this.titleColor
                                         : Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15.0),
+                                    //fontWeight: FontWeight.bold,
+                                    fontSize: 20.0),
                               ),
                             )
                           : Container(),
@@ -101,8 +112,8 @@ class EasyBadgeCard extends StatelessWidget {
                               child: Text(
                                 this.description,
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w100,
-                                    fontSize: 10.0,
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 12.0,
                                     color: (this.descriptionColor != null)
                                         ? this.descriptionColor
                                         : Colors.grey),
@@ -115,7 +126,7 @@ class EasyBadgeCard extends StatelessWidget {
               ),
               (this.suffixIcon != null && this.rightBadge == null)
                   ? Container(
-                      margin: const EdgeInsets.only(right: 10.0),
+                      margin: const EdgeInsets.only(right: 20.0),
                       child: Icon(
                         this.suffixIcon,
                         color: (this.suffixIconColor != null)
