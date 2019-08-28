@@ -15,7 +15,7 @@ class Navbar extends StatelessWidget {
       showUnselectedLabels: false,
       backgroundColor: Colors.black,
       unselectedItemColor: Colors.white,
-      selectedItemColor: CT.ColorTheme.loginGradientStart,
+      selectedItemColor: CT.ColorTheme.homeText,
       type: BottomNavigationBarType.fixed,
       items: [
         BottomNavigationBarItem(
@@ -23,7 +23,7 @@ class Navbar extends StatelessWidget {
             Icons.home,
           ),
           title: Text(
-            "Available",
+            "Home",
             style: TextStyle(),
           ),
         ),

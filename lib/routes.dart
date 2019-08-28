@@ -18,7 +18,7 @@ class Routes {
         theme: ThemeData(
           fontFamily: "TitilliumWebReg",
         ),
-        initialRoute: "/",
+        initialRoute: "/login",
         routes: routes,
       ),
     );

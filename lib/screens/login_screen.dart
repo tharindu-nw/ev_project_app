@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Color left = Colors.black;
   Color right = Colors.white;
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   final FocusNode myFocusNodeEmailLogin = FocusNode();
   final FocusNode myFocusNodePasswordLogin = FocusNode();
@@ -60,59 +60,62 @@ class _LoginScreenState extends State<LoginScreen> {
           },
           child: SingleChildScrollView(
             child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                decoration: BoxDecoration(
-                  gradient: CT.ColorTheme.loginGradient,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  // mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      margin: _bigPadding,
-                      child: new Image(
-                        width: 100.0,
-                        height: 100.0,
-                        fit: BoxFit.fill,
-                        image: new AssetImage('assets/img/bicycle_icon.png'),
-                      ),
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height >= 675.0
+                  ? MediaQuery.of(context).size.height
+                  : 675.0,
+              decoration: BoxDecoration(
+                gradient: CT.ColorTheme.loginGradient,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                //mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: _bigPadding,
+                    child: new Image(
+                      width: 100.0,
+                      height: 100.0,
+                      fit: BoxFit.fill,
+                      image: new AssetImage('assets/img/bicycle_icon.png'),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 20.0),
-                      child: _buildMenuBar(context),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 20.0),
+                    child: _buildMenuBar(context),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (i) {
+                        if (i == 0) {
+                          setState(() {
+                            right = Colors.white;
+                            left = Colors.black;
+                          });
+                        } else if (i == 1) {
+                          setState(() {
+                            right = Colors.black;
+                            left = Colors.white;
+                          });
+                        }
+                      },
+                      children: <Widget>[
+                        new ConstrainedBox(
+                          constraints: const BoxConstraints.expand(),
+                          child: _buildSignIn(context),
+                        ),
+                        new ConstrainedBox(
+                          constraints: const BoxConstraints.expand(),
+                          child: _buildSignUp(context),
+                        ),
+                      ],
                     ),
-                    Expanded(
-                      flex: 2,
-                      child: PageView(
-                        controller: _pageController,
-                        onPageChanged: (i) {
-                          if (i == 0) {
-                            setState(() {
-                              right = Colors.white;
-                              left = Colors.black;
-                            });
-                          } else if (i == 1) {
-                            setState(() {
-                              right = Colors.black;
-                              left = Colors.white;
-                            });
-                          }
-                        },
-                        children: <Widget>[
-                          new ConstrainedBox(
-                            constraints: const BoxConstraints.expand(),
-                            child: _buildSignIn(context),
-                          ),
-                          new ConstrainedBox(
-                            constraints: const BoxConstraints.expand(),
-                            child: _buildSignUp(context),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                )),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -254,9 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  onPressed: () {
-                    print("Login was pressed");
-                  },
+                  onPressed: () => _loginPressed(),
                 ),
               ),
             ],
@@ -584,6 +585,16 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  void _loginPressed() {
+    if (loginEmailController.text == "test@gmail.com" &&
+        loginPasswordController.text == "123456") {
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/", (Route<dynamic> route) => false);
+    } else {
+      print(MediaQuery.of(context).size.height);
+    }
+  }
+
   Widget _buildMenuBar(BuildContext context) {
     return Container(
       width: 300.0,
@@ -642,5 +653,23 @@ class _LoginScreenState extends State<LoginScreen> {
   void _onSignUpButtonPress() {
     _pageController?.animateToPage(1,
         duration: Duration(milliseconds: 500), curve: Curves.decelerate);
+  }
+
+  void showInSnackBar(String value) {
+    FocusScope.of(context).requestFocus(new FocusNode());
+    Scaffold.of(context)?.removeCurrentSnackBar();
+    print(value);
+    Scaffold.of(context)?.showSnackBar(SnackBar(
+      content: new Text(
+        value,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+            color: Colors.white,
+            fontSize: 16.0,
+            fontFamily: "TitilliumWebBold"),
+      ),
+      backgroundColor: Colors.blue,
+      duration: Duration(seconds: 3),
+    ));
   }
 }

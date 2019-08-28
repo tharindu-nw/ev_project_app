@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "32094747186",
+    "firebase_url": "https://ev-firestore-2019.firebaseio.com",
+    "project_id": "ev-firestore-2019",
+    "storage_bucket": "ev-firestore-2019.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32094747186:android:c1a0fec58a0f9e83",
+        "android_client_info": {
+          "package_name": "com.example.ev_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32094747186-9bkmafpaemq1ignnunbib85av2iceevs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAP8y4CQjO78ZsSkkTk6zmOesmr4U344Pc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "32094747186-9bkmafpaemq1ignnunbib85av2iceevs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
