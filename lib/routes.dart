@@ -7,7 +7,7 @@ class Routes {
   var routes = <String, WidgetBuilder>{
     "/": (BuildContext context) => new HomeScreen(),
     "/available": (BuildContext context) => new HomeScreen(),
-    "/bookings": (BuildContext context) => new BookingScreen(),
+    // "/bookings": (BuildContext context) => new BookingScreen(),
     "/login": (BuildContext context) => new LoginScreen(),
   };
 
@@ -18,7 +18,7 @@ class Routes {
         theme: ThemeData(
           fontFamily: "TitilliumWebReg",
         ),
-        initialRoute: "/login",
+        initialRoute: "/available",
         routes: routes,
       ),
     );

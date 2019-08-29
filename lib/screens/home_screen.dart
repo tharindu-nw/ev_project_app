@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ev_app/screens/bookings_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
@@ -16,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   var _cIndex = 0;
   PanelController _pc = new PanelController();
+  var myBike = null;
 
   @override
   void initState() {
@@ -196,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      onPressed: () => {_pc.open()},
+                      onPressed: () => _bookNow(),
                     ),
                   )
                 ],
@@ -302,5 +304,31 @@ class _HomeScreenState extends State<HomeScreen> {
   _logout() {
     Navigator.pushNamedAndRemoveUntil(
         context, "/login", (Route<dynamic> route) => false);
+  }
+
+  _bookNow() async {
+    var availableQuery = Firestore.instance
+        .collection("bicycles")
+        .where("availability", isEqualTo: true)
+        .limit(1);
+
+    await availableQuery.getDocuments().then((QuerySnapshot docs) {
+      if (docs.documents.isNotEmpty) {
+        myBike = docs.documents[0].documentID;
+
+        var docRef = Firestore.instance.collection("bicycles").document(myBike);
+
+        Firestore.instance.runTransaction((transaction) async {
+          await transaction.update(docRef, {"availability": false});
+        });
+
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => new BookingScreen(myBike: myBike),
+            ),
+            (Route<dynamic> route) => false);
+      }
+    });
   }
 }
