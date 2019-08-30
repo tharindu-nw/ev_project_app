@@ -221,9 +221,6 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
-      bottomNavigationBar: Navbar(
-        currentIndex: 0,
-      ),
     );
   }
 

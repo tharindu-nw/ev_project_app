@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ev_app/screens/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
@@ -39,27 +40,25 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget build(BuildContext context) {
     return Material(
       child: Scaffold(
-          appBar: _buildAppbar(),
-          body: NotificationListener<OverscrollIndicatorNotification>(
-            onNotification: (overscroll) {
-              overscroll.disallowGlow();
-            },
-            child: SingleChildScrollView(
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height >= 520
-                    ? MediaQuery.of(context).size.height
-                    : 520,
-                decoration: BoxDecoration(
-                  color: CT.ColorTheme.homeBackground,
-                ),
-                child: _buildBookings(),
+        appBar: _buildAppbar(),
+        body: NotificationListener<OverscrollIndicatorNotification>(
+          onNotification: (overscroll) {
+            overscroll.disallowGlow();
+          },
+          child: SingleChildScrollView(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height >= 520
+                  ? MediaQuery.of(context).size.height
+                  : 520,
+              decoration: BoxDecoration(
+                color: CT.ColorTheme.homeBackground,
               ),
+              child: _buildBookings(),
             ),
           ),
-          bottomNavigationBar: Navbar(
-            currentIndex: 1,
-          )),
+        ),
+      ),
     );
   }
 
@@ -75,6 +74,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 overflow: Overflow.visible,
                 children: <Widget>[
                   Card(
+                    margin: EdgeInsets.only(top: 40),
                     elevation: 10.0,
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -110,27 +110,18 @@ class _BookingScreenState extends State<BookingScreen> {
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 300.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24.0),
-                      color: CT.ColorTheme.homeText,
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                          color: Colors.black87,
-                          offset: Offset(1.0, 1.0),
-                          blurRadius: 5.0,
-                        ),
-                      ],
-                    ),
-                    child: MaterialButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24.0),
-                      ),
-                      highlightColor: Colors.transparent,
-                      splashColor: CT.ColorTheme.loginGradientStart,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 35.0),
+                    margin: EdgeInsets.only(top: 235.0),
+                    child: SizedBox(
+                      width: 175,
+                      height: 60,
+                      child: RaisedButton(
+                        color: Colors.greenAccent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(27.0)),
+                        elevation: 8,
+                        highlightElevation: 2,
+                        splashColor: Colors.white54,
+                        onPressed: () => _lockUnlockBike(false),
                         child: Text(
                           "Unlock",
                           style: TextStyle(
@@ -140,41 +131,54 @@ class _BookingScreenState extends State<BookingScreen> {
                           ),
                         ),
                       ),
-                      onPressed: () => _lockUnlockBike(false),
                     ),
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 365.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24.0),
-                      color: Colors.red,
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                          color: Colors.black87,
-                          offset: Offset(1.0, 1.0),
-                          blurRadius: 5.0,
-                        ),
-                      ],
-                    ),
-                    child: MaterialButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24.0),
-                      ),
-                      highlightColor: Colors.transparent,
-                      splashColor: CT.ColorTheme.loginGradientStart,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 35.0),
+                    margin: EdgeInsets.only(top: 315.0),
+                    child: SizedBox(
+                      width: 175,
+                      height: 60,
+                      child: RaisedButton(
+                        color: Colors.redAccent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(27.0)),
+                        elevation: 8,
+                        highlightElevation: 2,
+                        splashColor: Colors.white54,
+                        onPressed: () => _lockUnlockBike(true),
                         child: Text(
                           "Lock",
                           style: TextStyle(
                             fontFamily: "TitilliumWebBold",
                             color: Colors.white,
-                            fontSize: 28.0,
+                            fontSize: 25.0,
                           ),
                         ),
                       ),
-                      onPressed: () => _lockUnlockBike(true),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 395.0),
+                    child: SizedBox(
+                      width: 175,
+                      height: 60,
+                      child: RaisedButton(
+                        color: Colors.blueAccent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(27.0)),
+                        elevation: 8,
+                        highlightElevation: 2,
+                        splashColor: Colors.white54,
+                        onPressed: () => _finishTrip(),
+                        child: Text(
+                          "Finish",
+                          style: TextStyle(
+                            fontFamily: "TitilliumWebBold",
+                            color: Colors.white,
+                            fontSize: 25.0,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -229,5 +233,20 @@ class _BookingScreenState extends State<BookingScreen> {
     Firestore.instance.runTransaction((transaction) async {
       await transaction.update(docRef, {"locked": locked});
     });
+  }
+
+  _finishTrip() {
+    var docRef =
+        Firestore.instance.collection("bicycles").document(widget.myBike);
+    Firestore.instance.runTransaction((transaction) async {
+      await transaction.update(docRef, {"availability": true});
+    });
+
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => new HomeScreen(),
+        ),
+        (Route<dynamic> route) => false);
   }
 }
