@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
 import 'package:ev_app/utils/mock_data.dart';
 import 'package:ev_app/widgets/navigation/navbar.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class BookingScreen extends StatefulWidget {
   @override
@@ -186,11 +187,9 @@ class _BookingScreenState extends State<BookingScreen> {
             }
           default:
             {
-              return Text(
-                "Loading... Please wait",
-                style: TextStyle(
-                  color: Colors.white,
-                ),
+              return SpinKitFoldingCube(
+                color: Colors.white,
+                size: 50.0,
               );
             }
         }
