@@ -31,8 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: _buildAvailableScreen(),
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Material(
+        child: _buildAvailableScreen(),
+      ),
     );
   }
 
@@ -52,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
               ),
             ),
-            onPressed: () => {print(MediaQuery.of(context).size.height)},
+            onPressed: () => _logout(),
           ),
         ),
       ],
@@ -152,18 +155,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         children: <TextSpan>[
                           TextSpan(text: "There are "),
-                          TextSpan(
-                            text: "5",
-                            style: TextStyle(
-                              color: CT.ColorTheme.homeText,
-                              fontFamily: "NunitoRegular",
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          // TextSpan(
+                          //   text: "5",
+                          //   style: TextStyle(
+                          //     color: CT.ColorTheme.homeText,
+                          //     fontFamily: "NunitoRegular",
+                          //     fontSize: 18,
+                          //     fontWeight: FontWeight.bold,
+                          //   ),
+                          // ),
                           TextSpan(
                               text:
-                                  " bikes available at the dock right now. Click below to start your journey"),
+                                  "bikes available at the dock right now. Click below to start your journey"),
                         ],
                       ),
                     ),
@@ -325,6 +328,12 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context) => new BookingScreen(myBike: myBike),
             ),
             (Route<dynamic> route) => false);
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => new BookingScreen(myBike: myBike),
+        //   ),
+        // );
       }
     });
   }

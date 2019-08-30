@@ -4,6 +4,7 @@ import 'package:ev_app/style/color_theme.dart' as CT;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ev_app/utils/bubble_indication_painter.dart';
 import 'package:flutter/services.dart';
+import 'package:toast/toast.dart';
 
 final _bigPadding = EdgeInsets.fromLTRB(0.0, 60.0, 0.0, 0.0);
 
@@ -591,7 +592,12 @@ class _LoginScreenState extends State<LoginScreen> {
       Navigator.pushNamedAndRemoveUntil(
           context, "/", (Route<dynamic> route) => false);
     } else {
-      print(MediaQuery.of(context).size.height);
+      Toast.show(
+        "Invalid credentials!",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+      );
     }
   }
 
