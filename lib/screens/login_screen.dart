@@ -5,28 +5,29 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ev_app/utils/bubble_indication_painter.dart';
 import 'package:flutter/services.dart';
 import 'package:toast/toast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 final _bigPadding = EdgeInsets.fromLTRB(0.0, 60.0, 0.0, 0.0);
 
 class LoginScreen extends StatefulWidget {
-  _LoginScreenState createState() => new _LoginScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController loginEmailController = new TextEditingController();
-  TextEditingController loginPasswordController = new TextEditingController();
-  TextEditingController signupEmailController = new TextEditingController();
-  TextEditingController signupNameController = new TextEditingController();
-  TextEditingController signupPasswordController = new TextEditingController();
+  TextEditingController loginEmailController = TextEditingController();
+  TextEditingController loginPasswordController = TextEditingController();
+  TextEditingController signupEmailController = TextEditingController();
+  TextEditingController signupNameController = TextEditingController();
+  TextEditingController signupPasswordController = TextEditingController();
   TextEditingController signupConfirmPasswordController =
-      new TextEditingController();
+      TextEditingController();
 
   PageController _pageController;
 
   Color left = Colors.black;
   Color right = Colors.white;
 
-  // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final FocusNode myFocusNodeEmailLogin = FocusNode();
   final FocusNode myFocusNodePasswordLogin = FocusNode();
@@ -149,84 +150,87 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   width: 300,
                   height: 190,
-                  child: Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: 20.0,
-                          bottom: 20.0,
-                          left: 25.0,
-                          right: 25.0,
-                        ),
-                        child: TextField(
-                          controller: loginEmailController,
-                          keyboardType: TextInputType.emailAddress,
-                          style: TextStyle(
-                            fontFamily: "TitilliumWebBold",
-                            fontSize: 16,
-                            color: Colors.black,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: 20.0,
+                            bottom: 20.0,
+                            left: 25.0,
+                            right: 25.0,
                           ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            icon: Icon(
-                              FontAwesomeIcons.envelope,
-                              size: 22.0,
-                              color: Colors.black,
-                            ),
-                            hintText: "Email Address",
-                            hintStyle: TextStyle(
+                          child: TextField(
+                            controller: loginEmailController,
+                            keyboardType: TextInputType.emailAddress,
+                            style: TextStyle(
                               fontFamily: "TitilliumWebBold",
                               fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 250.0,
-                        height: 1.0,
-                        color: Colors.grey[400],
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: 20.0,
-                          bottom: 20.0,
-                          left: 25.0,
-                          right: 25.0,
-                        ),
-                        child: TextField(
-                          controller: loginPasswordController,
-                          obscureText: _obscureTextLogin,
-                          style: TextStyle(
-                            fontFamily: "TitilliumWebBold",
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            icon: Icon(
-                              FontAwesomeIcons.lock,
-                              size: 22.0,
                               color: Colors.black,
                             ),
-                            hintText: "Password",
-                            hintStyle: TextStyle(
-                              fontFamily: "TitilliumWebBold",
-                              fontSize: 16,
-                            ),
-                            suffixIcon: GestureDetector(
-                              onTap: _toggleLogin,
-                              child: Icon(
-                                _obscureTextLogin
-                                    ? FontAwesomeIcons.eye
-                                    : FontAwesomeIcons.eyeSlash,
-                                size: 15.0,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              icon: Icon(
+                                FontAwesomeIcons.envelope,
+                                size: 22.0,
                                 color: Colors.black,
+                              ),
+                              hintText: "Email Address",
+                              hintStyle: TextStyle(
+                                fontFamily: "TitilliumWebBold",
+                                fontSize: 16,
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                        Container(
+                          width: 250.0,
+                          height: 1.0,
+                          color: Colors.grey[400],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: 20.0,
+                            bottom: 20.0,
+                            left: 25.0,
+                            right: 25.0,
+                          ),
+                          child: TextField(
+                            controller: loginPasswordController,
+                            obscureText: _obscureTextLogin,
+                            style: TextStyle(
+                              fontFamily: "TitilliumWebBold",
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              icon: Icon(
+                                FontAwesomeIcons.lock,
+                                size: 22.0,
+                                color: Colors.black,
+                              ),
+                              hintText: "Password",
+                              hintStyle: TextStyle(
+                                fontFamily: "TitilliumWebBold",
+                                fontSize: 16,
+                              ),
+                              suffixIcon: GestureDetector(
+                                onTap: _toggleLogin,
+                                child: Icon(
+                                  _obscureTextLogin
+                                      ? FontAwesomeIcons.eye
+                                      : FontAwesomeIcons.eyeSlash,
+                                  size: 15.0,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -258,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  onPressed: () => _loginPressed(),
+                  onPressed: () => _validateCredentialsLogin(),
                 ),
               ),
             ],
@@ -512,7 +516,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontFamily: "TitilliumWebBold",
                             ),
                             suffixIcon: GestureDetector(
-                              onTap: _toggleSignupConfirm,
+                              onTap: _toggleSignUpConfirm,
                               child: Icon(
                                 _obscureTextSignupConfirm
                                     ? FontAwesomeIcons.eye
@@ -557,7 +561,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    onPressed: () {}
+                    onPressed: () => _validateCredentialsSignUp()
                     // showInSnackBar("SignUp button pressed")),
                     ),
               ),
@@ -580,25 +584,155 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  void _toggleSignupConfirm() {
+  void _toggleSignUpConfirm() {
     setState(() {
       _obscureTextSignupConfirm = !_obscureTextSignupConfirm;
     });
   }
 
-  void _loginPressed() {
-    if (loginEmailController.text == "test@gmail.com" &&
-        loginPasswordController.text == "123456") {
-      Navigator.pushNamedAndRemoveUntil(
-          context, "/", (Route<dynamic> route) => false);
+  void _validateCredentialsLogin() {
+    /*var email = loginEmailController.text;
+    var password = loginPasswordController.text;*/
+    var email = "tharindu@gmail.com";
+    var password = "123456";
+    if (_validateEmail(email) && password.length >= 6) {
+      _loginPressed();
     } else {
       Toast.show(
-        "Invalid credentials!",
+        "Please enter a valid email and password",
         context,
         duration: Toast.LENGTH_LONG,
         gravity: Toast.BOTTOM,
       );
     }
+  }
+
+  void _validateCredentialsSignUp() {
+    var name = signupNameController.text;
+    var email = signupEmailController.text;
+    var password = signupPasswordController.text;
+    var passwordConfirm = signupConfirmPasswordController.text;
+    if(name.length == 0){
+      Toast.show(
+        "Please enter a valid name",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+      );
+    }
+    else if(password != passwordConfirm){
+      Toast.show(
+        "Passwords do not match",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+      );
+    }else if(!_validateEmail(email)){
+      Toast.show(
+        "Please enter a valid email",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+      );
+    }else if(password.length < 6){
+      Toast.show(
+        "Password should be longer than 6 characters",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+      );
+      signupPasswordController.clear();
+      signupConfirmPasswordController.clear();
+    } else {
+      _registerPressed();
+    }
+  }
+
+  Future<void> _loginPressed() async {
+    try {
+      FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: "tharindu@gmail.com",
+              password: "123456")
+          .then((AuthResult result) {
+        if (result.user != null) {
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/", (Route<dynamic> route) => false);
+        } else {
+          Toast.show(
+            "Your email and password did not match",
+            context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM,
+          );
+        }
+      });
+    } on PlatformException catch (e) {
+      print(e);
+      Toast.show(
+        e.message,
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _registerPressed() async {
+    try {
+      FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: signupEmailController.text,
+              password: signupPasswordController.text)
+          .then((AuthResult result) {
+        if (result.user.uid != null) {
+          UserUpdateInfo info = new UserUpdateInfo();
+          info.displayName = signupNameController.text;
+          result.user.updateProfile(info);
+          //TODO: Load the confirm email screen
+          /*Navigator.pushNamedAndRemoveUntil(
+              context, "/", (Route<dynamic> route) => false);*/
+          Toast.show(
+            "Successfully Registered",
+            context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM,
+          );
+          signupNameController.clear();
+          signupEmailController.clear();
+          signupPasswordController.clear();
+          signupConfirmPasswordController.clear();
+
+          _onSignInButtonPress();
+        } else {
+          Toast.show(
+            "Sorry, we could't sign you up. Please try again in a bit",
+            context,
+            duration: Toast.LENGTH_LONG,
+            gravity: Toast.BOTTOM,
+          );
+        }
+      });
+    } on PlatformException catch (e) {
+      print(e);
+      Toast.show(
+        e.message,
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+      );
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  bool _validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    return (!regex.hasMatch(value)) ? false : true;
   }
 
   Widget _buildMenuBar(BuildContext context) {

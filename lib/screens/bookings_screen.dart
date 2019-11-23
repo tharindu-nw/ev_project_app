@@ -3,8 +3,6 @@ import 'package:ev_app/screens/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
-import 'package:ev_app/utils/mock_data.dart';
-import 'package:ev_app/widgets/navigation/navbar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:toast/toast.dart';
 
@@ -67,7 +65,6 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  @override
   Widget _buildBookings() {
     return Center(
       child: FutureBuilder(
@@ -117,7 +114,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(top: 235.0),
+                      margin: EdgeInsets.only(top: 395.0),
                       child: SizedBox(
                         width: 175,
                         height: 60,
@@ -131,54 +128,6 @@ class _BookingScreenState extends State<BookingScreen> {
                           onPressed: () => _lockUnlockBike(false),
                           child: Text(
                             "Unlock",
-                            style: TextStyle(
-                              fontFamily: "TitilliumWebBold",
-                              color: Colors.white,
-                              fontSize: 25.0,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 315.0),
-                      child: SizedBox(
-                        width: 175,
-                        height: 60,
-                        child: RaisedButton(
-                          color: Colors.redAccent,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(27.0)),
-                          elevation: 8,
-                          highlightElevation: 2,
-                          splashColor: Colors.white54,
-                          onPressed: () => _lockUnlockBike(true),
-                          child: Text(
-                            "Lock",
-                            style: TextStyle(
-                              fontFamily: "TitilliumWebBold",
-                              color: Colors.white,
-                              fontSize: 25.0,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 395.0),
-                      child: SizedBox(
-                        width: 175,
-                        height: 60,
-                        child: RaisedButton(
-                          color: Colors.blueAccent,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(27.0)),
-                          elevation: 8,
-                          highlightElevation: 2,
-                          splashColor: Colors.white54,
-                          onPressed: () => _finishTrip(),
-                          child: Text(
-                            "Finish",
                             style: TextStyle(
                               fontFamily: "TitilliumWebBold",
                               color: Colors.white,

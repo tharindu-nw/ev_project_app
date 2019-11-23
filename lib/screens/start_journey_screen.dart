@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ev_app/screens/bookings_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,11 +11,16 @@ import 'package:ev_app/widgets/cards/easyBadgeCard.dart';
 import 'package:ev_app/widgets/navigation/navbar.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class HomeScreen extends StatefulWidget {
-  _HomeScreenState createState() => new _HomeScreenState();
+class StartJourneyScreen extends StatefulWidget {
+  @override
+  _StartJourneyScreenState createState() => new _StartJourneyScreenState();
+
+  final String stationId;
+
+  StartJourneyScreen({@required this.stationId}) : assert(stationId != null);
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _StartJourneyScreenState extends State<StartJourneyScreen> {
   PanelController _pc = new PanelController();
   var myBike = null;
   var _auth = FirebaseAuth.instance;
@@ -34,7 +40,40 @@ class _HomeScreenState extends State<HomeScreen> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Material(
-        child: _buildAvailableScreen(),
+        child: FutureBuilder(
+          future: _getAvailability(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.done:
+                {
+                  if(snapshot.data.documents.isNotEmpty){
+                    return _buildAvailableScreen();
+                  }else{
+                    return _buildBookedScreen();
+                  }
+                  break;
+                }
+              case ConnectionState.waiting:
+                {
+                  return SpinKitCubeGrid(
+                    color: CT.ColorTheme.homeText,
+                    size: 50.0,
+                  );
+                }
+              case ConnectionState.active:
+                {
+                  return SpinKitCubeGrid(
+                    color: CT.ColorTheme.homeText,
+                    size: 50.0,
+                  );
+                }
+              default:
+                {
+                  return _buildBookedScreen();
+                }
+            }
+          },
+        ),
       ),
     );
   }
@@ -59,35 +98,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildCycleList() {
-    return StreamBuilder(
-      stream: Firestore.instance.collection("bicycles").snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Text("Loading...");
-        return ListView.builder(
-          shrinkWrap: true,
-          padding: const EdgeInsets.all(8.0),
-          itemCount: snapshot.data.documents.length,
-          itemBuilder: (BuildContext context, int index) {
-            DocumentSnapshot doc = snapshot.data.documents[index];
-            return EasyBadgeCard(
-              leftBadge: Colors.white,
-              prefixIcon: FontAwesomeIcons.bicycle,
-              prefixIconColor: Color(0xFF160F29),
-              backgroundColor: CT.ColorTheme.cardBackground,
-              title: "Bike ${index + 1}",
-              description: 'Rating: ${doc['rating']}',
-              titleColor: Color(0xFF160F29),
-              descriptionColor: Color(0xFF160F29),
-              suffixIcon: Icons.arrow_forward_ios,
-              suffixIconColor: Color(0xFF160F29),
-            );
-          },
-        );
-      },
     );
   }
 
@@ -117,82 +127,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 250.0,
                         height: 250.0,
                         fit: BoxFit.fill,
-                        image: new AssetImage('assets/img/home_walk.png')),
+                        image: new AssetImage('assets/img/home_bike.png')),
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 10.0),
-                    child: FutureBuilder(
-                      future: _getUserName(),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        switch (snapshot.connectionState) {
-                          case ConnectionState.done:
-                            {
-                              return new Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    "Hello ",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "NunitoRegular",
-                                      fontSize: 37,
-                                    ),
-                                  ),
-                                  Text(
-                                    "${snapshot.data}",
-                                    style: TextStyle(
-                                      color: CT.ColorTheme.homeText,
-                                      fontFamily: "NunitoRegular",
-                                      fontSize: 37,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                          case ConnectionState.waiting:
-                            {
-                              return SpinKitCubeGrid(
-                                color: CT.ColorTheme.homeText,
-                                size: 50.0,
-                              );
-                            }
-                          case ConnectionState.active:
-                            {
-                              return SpinKitCubeGrid(
-                                color: CT.ColorTheme.homeText,
-                                size: 50.0,
-                              );
-                            }
-                          default:
-                            {
-                              return Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    "Hello ",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "NunitoRegular",
-                                      fontSize: 37,
-                                    ),
-                                  ),
-                                  Text(
-                                    "There!",
-                                    style: TextStyle(
-                                      color: CT.ColorTheme.homeText,
-                                      fontFamily: "NunitoRegular",
-                                      fontSize: 37,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                        }
-                      },
-                    ),
-                    /*Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
@@ -213,13 +152,13 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ],
-                    ),*/
+                    ),
                   ),
                   Container(
                     padding: EdgeInsets.only(top: 10.0),
                     width: MediaQuery.of(context).size.width * 0.7,
                     child: Text(
-                      "Click below to start your next journey",
+                      "There are bikes available at the dock right now. Clic here to start your journey",
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: "NunitoRegular",
@@ -272,9 +211,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 20.0),
+                            vertical: 8.0, horizontal: 35.0),
                         child: Text(
-                          "Select Station",
+                          "Book Now",
                           style: TextStyle(
                             fontFamily: "TitilliumWebBold",
                             color: Colors.white,
@@ -282,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      onPressed: () => _openStationsScreen(),
+                      onPressed: () => _bookNow(),
                     ),
                   )
                 ],
@@ -376,15 +315,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Navbar(
-        currentIndex: 0,
-      ),
     );
-  }
-
-  Future<String> _getUserName() async {
-    FirebaseUser user = await _auth.currentUser();
-    return user.displayName;
   }
 
   _logout() {
@@ -392,9 +323,45 @@ class _HomeScreenState extends State<HomeScreen> {
         context, "/login", (Route<dynamic> route) => false);
   }
 
-  _openStationsScreen(){
-    Navigator.pushNamedAndRemoveUntil(
-        context, "/stations", (Route<dynamic> route) => false);
+  Future<QuerySnapshot> _getAvailability() async {
+    var availableQuery = Firestore.instance
+        .collection("bicycles")
+        .where("stationId", isEqualTo: widget.stationId)
+        .where("availability", isEqualTo: true);
+
+    return await availableQuery.getDocuments();
   }
 
+  _bookNow() async {
+    var availableQuery = Firestore.instance
+        .collection("bicycles")
+        .where("stationId", isEqualTo: widget.stationId)
+        .where("availability", isEqualTo: true)
+        .limit(1);
+
+    await availableQuery.getDocuments().then((QuerySnapshot docs) {
+      if (docs.documents.isNotEmpty) {
+        myBike = docs.documents[0].documentID;
+
+        var docRef = Firestore.instance.collection("bicycles").document(myBike);
+
+        Firestore.instance.runTransaction((transaction) async {
+          await transaction.update(docRef, {"availability": false});
+        });
+
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => new BookingScreen(myBike: myBike),
+            ),
+            (Route<dynamic> route) => false);
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => new BookingScreen(myBike: myBike),
+        //   ),
+        // );
+      }
+    });
+  }
 }
