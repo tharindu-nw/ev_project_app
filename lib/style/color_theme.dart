@@ -9,7 +9,7 @@ class ColorTheme {
   static const Color bookingGradientStart = const Color(0xFF5966FF);
   static const Color themeColor = const Color(0xFF090446);
   static const Color barColor = const Color(0xFF011627);
-  static const Color cardBackground = const Color(0xFFA0E8AF);
+  static const Color cardBackground = const Color(0xFF2ED1B2);
   static const Color homeBackground = const Color(0xFF2C2C2C);
   static const Color homeText = const Color(0xFF2ED1B2);
   static const Color warningText = const Color(0xFFCB4573);

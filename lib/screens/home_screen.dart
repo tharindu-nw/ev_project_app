@@ -1,23 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ev_app/screens/bookings_screen.dart';
+import 'package:ev_app/screens/stations_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:ev_app/widgets/cards/easyBadgeCard.dart';
-import 'package:ev_app/utils/mock_data.dart';
-import 'package:ev_app/widgets/navigation/navbar.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => new _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  var _cIndex = 0;
   PanelController _pc = new PanelController();
   var myBike = null;
+  var _auth = FirebaseAuth.instance;
+  var _userEmail = "";
+  var _credit = "";
+
 
   @override
   void initState() {
@@ -62,34 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCycleList() {
-    return StreamBuilder(
-      stream: Firestore.instance.collection("bicycles").snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Text("Loading...");
-        return ListView.builder(
-          padding: const EdgeInsets.all(8.0),
-          itemCount: snapshot.data.documents.length,
-          itemBuilder: (BuildContext context, int index) {
-            DocumentSnapshot doc = snapshot.data.documents[index];
-            return EasyBadgeCard(
-              leftBadge: Colors.white,
-              prefixIcon: FontAwesomeIcons.bicycle,
-              prefixIconColor: Color(0xFF160F29),
-              backgroundColor: CT.ColorTheme.cardBackground,
-              title: "Bike ${index + 1}",
-              description: 'Rating: ${doc['rating']}',
-              titleColor: Color(0xFF160F29),
-              descriptionColor: Color(0xFF160F29),
-              suffixIcon: Icons.arrow_forward_ios,
-              suffixIconColor: Color(0xFF160F29),
-            );
-          },
-        );
-      },
-    );
-  }
-
   Widget _buildAvailableScreen() {
     return Scaffold(
       appBar: _buildAppbar(),
@@ -102,9 +78,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: SingleChildScrollView(
             child: Container(
               width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height >= 550.0
+              height: MediaQuery.of(context).size.height >= 650.0
                   ? MediaQuery.of(context).size.height
-                  : 550.0,
+                  : 650.0,
               decoration: BoxDecoration(
                 color: CT.ColorTheme.homeBackground,
               ),
@@ -116,60 +92,103 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 250.0,
                         height: 250.0,
                         fit: BoxFit.fill,
-                        image: new AssetImage('assets/img/home_bike.png')),
+                        image: new AssetImage('assets/img/home_walk.png')),
                   ),
                   Padding(
                     padding: EdgeInsets.only(top: 10.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          "Bikes ",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: "NunitoRegular",
-                            fontSize: 37,
-                          ),
-                        ),
-                        Text(
-                          "available",
-                          style: TextStyle(
-                            color: CT.ColorTheme.homeText,
-                            fontFamily: "NunitoRegular",
-                            fontSize: 37,
-                          ),
-                        ),
-                      ],
+                    child: FutureBuilder(
+                      future: _getUserName(),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.done:
+                            {
+                              return new Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    "Hello ",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "NunitoRegular",
+                                      fontSize: 37,
+                                    ),
+                                  ),
+                                  (snapshot.data != null)
+                                  ?
+                                  Text(
+                                    "${snapshot.data}",
+                                    style: TextStyle(
+                                      color: CT.ColorTheme.homeText,
+                                      fontFamily: "NunitoRegular",
+                                      fontSize: 37,
+                                    ),
+                                  ) : Text(
+                                    "There!",
+                                    style: TextStyle(
+                                      color: CT.ColorTheme.homeText,
+                                      fontFamily: "NunitoRegular",
+                                      fontSize: 37,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                          case ConnectionState.waiting:
+                            {
+                              return SpinKitCubeGrid(
+                                color: CT.ColorTheme.homeText,
+                                size: 50.0,
+                              );
+                            }
+                          case ConnectionState.active:
+                            {
+                              return SpinKitCubeGrid(
+                                color: CT.ColorTheme.homeText,
+                                size: 50.0,
+                              );
+                            }
+                          default:
+                            {
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    "Hello ",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "NunitoRegular",
+                                      fontSize: 37,
+                                    ),
+                                  ),
+                                  Text(
+                                    "There!",
+                                    style: TextStyle(
+                                      color: CT.ColorTheme.homeText,
+                                      fontFamily: "NunitoRegular",
+                                      fontSize: 37,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                        }
+                      },
                     ),
                   ),
                   Container(
                     padding: EdgeInsets.only(top: 10.0),
-                    width: MediaQuery.of(context).size.width * 0.58,
-                    child: RichText(
-                      text: TextSpan(
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "NunitoRegular",
-                          fontSize: 16,
-                        ),
-                        children: <TextSpan>[
-                          TextSpan(text: "There are "),
-                          // TextSpan(
-                          //   text: "5",
-                          //   style: TextStyle(
-                          //     color: CT.ColorTheme.homeText,
-                          //     fontFamily: "NunitoRegular",
-                          //     fontSize: 18,
-                          //     fontWeight: FontWeight.bold,
-                          //   ),
-                          // ),
-                          TextSpan(
-                              text:
-                                  "bikes available at the dock right now. Click below to start your journey"),
-                        ],
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    child: Text(
+                      "Click below to start your next journey",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: "NunitoRegular",
+                        fontSize: 16,
                       ),
-                    ),
+                      textAlign: TextAlign.center,
+                    )
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 30.0),
@@ -191,9 +210,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                            vertical: 8.0, horizontal: 35.0),
+                            vertical: 8.0, horizontal: 20.0),
                         child: Text(
-                          "Book Now",
+                          "Select Station",
                           style: TextStyle(
                             fontFamily: "TitilliumWebBold",
                             color: Colors.white,
@@ -201,9 +220,84 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      onPressed: () => _bookNow(),
+                      onPressed: () => _openStationsScreen(),
                     ),
-                  )
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 40.0),
+                    child: FutureBuilder(
+                      future: _getUserData(),
+                      builder: (BuildContext context, AsyncSnapshot snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.done:
+                            {
+                              return (snapshot.data.documents.isNotEmpty)
+                                  ? Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    "Trips : ${snapshot.data.documents[0].data["trips"].toString()}",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "NunitoRegular",
+                                      fontSize: 22,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Credit :  ${snapshot.data.documents[0].data["amount"].toString()}",
+                                    style: TextStyle(
+                                      color: CT.ColorTheme.homeText,
+                                      fontFamily: "NunitoRegular",
+                                      fontSize: 22,
+                                    ),
+                                  ),
+                                ],
+                              ) : Container();
+                            }
+                          case ConnectionState.waiting:
+                            {
+                              return SpinKitCubeGrid(
+                                color: CT.ColorTheme.homeText,
+                                size: 50.0,
+                              );
+                            }
+                          case ConnectionState.active:
+                            {
+                              return SpinKitCubeGrid(
+                                color: CT.ColorTheme.homeText,
+                                size: 50.0,
+                              );
+                            }
+                          default:
+                            {
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    "Hello ",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: "NunitoRegular",
+                                      fontSize: 37,
+                                    ),
+                                  ),
+                                  Text(
+                                    "There!",
+                                    style: TextStyle(
+                                      color: CT.ColorTheme.homeText,
+                                      fontFamily: "NunitoRegular",
+                                      fontSize: 37,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                        }
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -227,78 +321,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBookedScreen() {
-    return Scaffold(
-      appBar: _buildAppbar(),
-      body: NotificationListener<OverscrollIndicatorNotification>(
-        onNotification: (overscroll) {
-          overscroll.disallowGlow();
-        },
-        child: SingleChildScrollView(
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height >= 480.0
-                ? MediaQuery.of(context).size.height
-                : 480.0,
-            decoration: BoxDecoration(
-              color: CT.ColorTheme.homeBackground,
-            ),
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 10.0),
-                  child: new Image(
-                      width: 250.0,
-                      height: 250.0,
-                      fit: BoxFit.fill,
-                      image: new AssetImage('assets/img/home_walk.png')),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 10.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        "Sorry, we are ",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "NunitoRegular",
-                          fontSize: 30,
-                        ),
-                      ),
-                      Text(
-                        "booked",
-                        style: TextStyle(
-                          color: CT.ColorTheme.warningText,
-                          fontFamily: "NunitoRegular",
-                          fontSize: 30,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 10.0),
-                  width: MediaQuery.of(context).size.width * 0.75,
-                  child: Text(
-                    "Currently there are no bikes available at the dock. Please check again in a short while",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: "NunitoRegular",
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      bottomNavigationBar: Navbar(
-        currentIndex: 0,
-      ),
-    );
+  Future<String> _getUserName() async {
+    FirebaseUser user = await _auth.currentUser();
+    _userEmail = user.email;
+    return user.displayName;
+  }
+
+  Future<QuerySnapshot> _getUserData()async {
+    final prefs = await SharedPreferences.getInstance();
+    FirebaseUser user = await _auth.currentUser();
+    var userQuery = Firestore.instance
+        .collection("users")
+        .where("email", isEqualTo: user.email);
+
+    userQuery.getDocuments().then((QuerySnapshot snapshot) {
+      if(snapshot.documents.isNotEmpty){
+        var user = snapshot.documents[0];
+        _credit = user.data["amount"].toString();
+      }
+    });
+
+    return await userQuery.getDocuments();
   }
 
   _logout() {
@@ -306,35 +349,13 @@ class _HomeScreenState extends State<HomeScreen> {
         context, "/login", (Route<dynamic> route) => false);
   }
 
-  _bookNow() async {
-    var availableQuery = Firestore.instance
-        .collection("bicycles")
-        .where("availability", isEqualTo: true)
-        .limit(1);
-
-    await availableQuery.getDocuments().then((QuerySnapshot docs) {
-      if (docs.documents.isNotEmpty) {
-        myBike = docs.documents[0].documentID;
-
-        var docRef = Firestore.instance.collection("bicycles").document(myBike);
-
-        Firestore.instance.runTransaction((transaction) async {
-          await transaction.update(docRef, {"availability": false});
-        });
-
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => new BookingScreen(myBike: myBike),
-            ),
-            (Route<dynamic> route) => false);
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => new BookingScreen(myBike: myBike),
-        //   ),
-        // );
-      }
-    });
+  _openStationsScreen(){
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => new StationsScreen(credit: _credit),
+      ),
+    );
   }
+
 }

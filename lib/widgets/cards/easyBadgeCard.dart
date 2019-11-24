@@ -103,7 +103,7 @@ class EasyBadgeCard extends StatelessWidget {
                                         ? this.titleColor
                                         : Colors.black,
                                     //fontWeight: FontWeight.bold,
-                                    fontSize: 20.0),
+                                    fontSize: 15.0),
                               ),
                             )
                           : Container(),

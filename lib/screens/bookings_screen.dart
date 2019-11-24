@@ -3,36 +3,34 @@ import 'package:ev_app/screens/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
-import 'package:ev_app/utils/mock_data.dart';
-import 'package:ev_app/widgets/navigation/navbar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:toast/toast.dart';
+import 'package:intl/intl.dart';
 
 class BookingScreen extends StatefulWidget {
   @override
   _BookingScreenState createState() => _BookingScreenState();
 
   final String myBike;
+  final String credit;
 
-  BookingScreen({@required this.myBike}) : assert(myBike != null);
+  BookingScreen({@required this.myBike,
+                  @required this.credit}) : assert(myBike != null),
+                                            assert(credit != null);
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  var _cIndex = 1;
   var bike;
-
-  void _incrementTab(index) {
-    setState(() {
-      _cIndex = index;
-    });
-  }
+  var isTripStarted = false;
+  var startTime = "-- : -- : --";
+  var cardHeight = 380;
 
   @override
   void initState() {
     super.initState();
   }
 
-  _getBikeDetails() {
+  _getBikeDetails() async {
     var docRef =
         Firestore.instance.collection("bicycles").document(widget.myBike);
     return docRef.get();
@@ -67,7 +65,6 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  @override
   Widget _buildBookings() {
     return Center(
       child: FutureBuilder(
@@ -89,7 +86,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       ),
                       child: Container(
                         width: 300,
-                        height: 450,
+                        height: cardHeight.toDouble(),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                               vertical: 20.0, horizontal: 25.0),
@@ -111,78 +108,134 @@ class _BookingScreenState extends State<BookingScreen> {
                                   color: CT.ColorTheme.homeText,
                                 ),
                               ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                                child: Table(
+                                  defaultColumnWidth: FlexColumnWidth(),
+                                  children: <TableRow>[
+                                    TableRow(
+                                      children: <Widget>[
+                                        Text(
+                                          "Start time",
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          startTime,
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                              fontFamily: "TitilliumWebBold",
+                                            color: CT.ColorTheme.homeText
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    TableRow(
+                                      children: <Widget>[
+                                        Text(
+                                          "Fare",
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                              color: CT.ColorTheme.homeText,
+                                              fontFamily: "TitilliumWebBold",
+                                            ),
+                                            children: <TextSpan>[
+                                              TextSpan(text: "0.00 ",),
+                                              TextSpan(
+                                                  text: "LKR",
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: CT.ColorTheme.homeText
+                                                  ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    TableRow(
+                                      children: <Widget>[
+                                        Text(
+                                          "Battery",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          "${snapshot.data["batteryLevel"]} %",
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            color: CT.ColorTheme.homeText,
+                                            fontFamily: "TitilliumWebBold",
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    TableRow(
+                                      children: <Widget>[
+                                        Text(
+                                          "Credit",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        RichText(
+                                          text: TextSpan(
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                              color: CT.ColorTheme.homeText,
+                                              fontFamily: "TitilliumWebBold",
+                                            ),
+                                            children: <TextSpan>[
+                                              TextSpan(text: widget.credit),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
                     ),
-                    Container(
-                      margin: EdgeInsets.only(top: 235.0),
-                      child: SizedBox(
-                        width: 175,
-                        height: 60,
-                        child: RaisedButton(
-                          color: CT.ColorTheme.homeText,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(27.0)),
-                          elevation: 8,
-                          highlightElevation: 2,
-                          splashColor: Colors.white54,
-                          onPressed: () => _lockUnlockBike(false),
-                          child: Text(
-                            "Unlock",
-                            style: TextStyle(
-                              fontFamily: "TitilliumWebBold",
-                              color: Colors.white,
-                              fontSize: 25.0,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 315.0),
-                      child: SizedBox(
-                        width: 175,
-                        height: 60,
-                        child: RaisedButton(
-                          color: Colors.redAccent,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(27.0)),
-                          elevation: 8,
-                          highlightElevation: 2,
-                          splashColor: Colors.white54,
-                          onPressed: () => _lockUnlockBike(true),
-                          child: Text(
-                            "Lock",
-                            style: TextStyle(
-                              fontFamily: "TitilliumWebBold",
-                              color: Colors.white,
-                              fontSize: 25.0,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 395.0),
-                      child: SizedBox(
-                        width: 175,
-                        height: 60,
-                        child: RaisedButton(
-                          color: Colors.blueAccent,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(27.0)),
-                          elevation: 8,
-                          highlightElevation: 2,
-                          splashColor: Colors.white54,
-                          onPressed: () => _finishTrip(),
-                          child: Text(
-                            "Finish",
-                            style: TextStyle(
-                              fontFamily: "TitilliumWebBold",
-                              color: Colors.white,
-                              fontSize: 25.0,
+                    Visibility(
+                      visible: !isTripStarted,
+                      child: Container(
+                        margin: EdgeInsets.only(top: 325.0),
+                        child: SizedBox(
+                          width: 175,
+                          height: 60,
+                          child: RaisedButton(
+                            color: CT.ColorTheme.homeText,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(27.0)),
+                            elevation: 8,
+                            highlightElevation: 2,
+                            splashColor: Colors.white54,
+                            onPressed: () => _lockUnlockBike(false),
+                            child: Text(
+                              "Unlock",
+                              style: TextStyle(
+                                fontFamily: "TitilliumWebBold",
+                                color: Colors.white,
+                                fontSize: 25.0,
+                              ),
                             ),
                           ),
                         ),
@@ -268,29 +321,6 @@ class _BookingScreenState extends State<BookingScreen> {
     );
   }
 
-  Widget _buildAppbar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: CT.ColorTheme.homeBackground,
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(right: 2.0),
-          child: FlatButton(
-            child: Text(
-              "Logout",
-              style: TextStyle(
-                fontFamily: "TitilliumWebBold",
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
-            onPressed: () => _logout(),
-          ),
-        ),
-      ],
-    );
-  }
-
   _logout() {
     Navigator.pushNamedAndRemoveUntil(
         context, "/login", (Route<dynamic> route) => false);
@@ -308,6 +338,12 @@ class _BookingScreenState extends State<BookingScreen> {
           duration: Toast.LENGTH_SHORT,
           gravity: Toast.BOTTOM,
         );
+
+        setState(() {
+          startTime = DateFormat("HH:mm:ss").format(DateTime.now());
+          cardHeight = 280;
+          isTripStarted = true;
+        });
       });
     });
   }
