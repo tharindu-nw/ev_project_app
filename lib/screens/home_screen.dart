@@ -5,11 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
-import 'package:ev_app/widgets/cards/easyBadgeCard.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => new _HomeScreenState();
@@ -19,7 +16,6 @@ class _HomeScreenState extends State<HomeScreen> {
   PanelController _pc = new PanelController();
   var myBike = null;
   var _auth = FirebaseAuth.instance;
-  var _userEmail = "";
   var _credit = "";
 
 
@@ -328,7 +324,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<QuerySnapshot> _getUserData()async {
-    final prefs = await SharedPreferences.getInstance();
     FirebaseUser user = await _auth.currentUser();
     var userQuery = Firestore.instance
         .collection("users")
