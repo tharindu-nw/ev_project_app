@@ -319,7 +319,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<String> _getUserName() async {
     FirebaseUser user = await _auth.currentUser();
-    _userEmail = user.email;
     return user.displayName;
   }
 
