@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ev_app/utils/bubble_indication_painter.dart';
 import 'package:flutter/services.dart';
 import 'package:toast/toast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 final _bigPadding = EdgeInsets.fromLTRB(0.0, 60.0, 0.0, 0.0);
@@ -18,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController loginPasswordController = TextEditingController();
   TextEditingController signupEmailController = TextEditingController();
   TextEditingController signupNameController = TextEditingController();
+  TextEditingController signupPhoneController = TextEditingController();
   TextEditingController signupPasswordController = TextEditingController();
   TextEditingController signupConfirmPasswordController =
       TextEditingController();
@@ -35,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final FocusNode myFocusNodePassword = FocusNode();
   final FocusNode myFocusNodeEmail = FocusNode();
   final FocusNode myFocusNodeName = FocusNode();
+  final FocusNode myFocusNodePhone = FocusNode();
 
   bool _obscureTextLogin = true;
   bool _obscureTextSignup = true;
@@ -281,96 +284,96 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 5.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  height: 1.0,
-                  width: 100.0,
-                  decoration: BoxDecoration(
-                    gradient: new LinearGradient(
-                      colors: [
-                        Colors.white10,
-                        Colors.white,
-                      ],
-                      stops: [0.0, 1.0],
-                      begin: const FractionalOffset(0.0, 0.0),
-                      end: const FractionalOffset(1.0, 1.0),
-                      tileMode: TileMode.clamp,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Text(
-                    "Or",
-                    style: TextStyle(
-                      fontFamily: "TitilliumWebBold",
-                      color: Colors.white,
-                      fontSize: 18.0,
-                    ),
-                  ),
-                ),
-                Container(
-                  height: 1.0,
-                  width: 100.0,
-                  decoration: BoxDecoration(
-                    gradient: new LinearGradient(
-                      colors: [
-                        Colors.white,
-                        Colors.white10,
-                      ],
-                      stops: [0.0, 1.0],
-                      begin: const FractionalOffset(0.0, 0.0),
-                      end: const FractionalOffset(1.0, 1.0),
-                      tileMode: TileMode.clamp,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 10.0, right: 40.0),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    padding: const EdgeInsets.all(15.0),
-                    decoration: new BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: new Icon(
-                      FontAwesomeIcons.facebookF,
-                      color: Color(0xFF0084ff),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 10.0),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    padding: const EdgeInsets.all(15.0),
-                    decoration: new BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: new Icon(
-                      FontAwesomeIcons.google,
-                      color: Color(0xFF0084ff),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          // Padding(
+          //   padding: EdgeInsets.only(top: 5.0),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.center,
+          //     children: <Widget>[
+          //       Container(
+          //         height: 1.0,
+          //         width: 100.0,
+          //         decoration: BoxDecoration(
+          //           gradient: new LinearGradient(
+          //             colors: [
+          //               Colors.white10,
+          //               Colors.white,
+          //             ],
+          //             stops: [0.0, 1.0],
+          //             begin: const FractionalOffset(0.0, 0.0),
+          //             end: const FractionalOffset(1.0, 1.0),
+          //             tileMode: TileMode.clamp,
+          //           ),
+          //         ),
+          //       ),
+          //       Padding(
+          //         padding: EdgeInsets.symmetric(horizontal: 15.0),
+          //         child: Text(
+          //           "Or",
+          //           style: TextStyle(
+          //             fontFamily: "TitilliumWebBold",
+          //             color: Colors.white,
+          //             fontSize: 18.0,
+          //           ),
+          //         ),
+          //       ),
+          //       Container(
+          //         height: 1.0,
+          //         width: 100.0,
+          //         decoration: BoxDecoration(
+          //           gradient: new LinearGradient(
+          //             colors: [
+          //               Colors.white,
+          //               Colors.white10,
+          //             ],
+          //             stops: [0.0, 1.0],
+          //             begin: const FractionalOffset(0.0, 0.0),
+          //             end: const FractionalOffset(1.0, 1.0),
+          //             tileMode: TileMode.clamp,
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children: <Widget>[
+          //     Padding(
+          //       padding: EdgeInsets.only(top: 10.0, right: 40.0),
+          //       child: GestureDetector(
+          //         onTap: () {},
+          //         child: Container(
+          //           padding: const EdgeInsets.all(15.0),
+          //           decoration: new BoxDecoration(
+          //             shape: BoxShape.circle,
+          //             color: Colors.white,
+          //           ),
+          //           child: new Icon(
+          //             FontAwesomeIcons.facebookF,
+          //             color: Color(0xFF0084ff),
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //     Padding(
+          //       padding: EdgeInsets.only(top: 10.0),
+          //       child: GestureDetector(
+          //         onTap: () {},
+          //         child: Container(
+          //           padding: const EdgeInsets.all(15.0),
+          //           decoration: new BoxDecoration(
+          //             shape: BoxShape.circle,
+          //             color: Colors.white,
+          //           ),
+          //           child: new Icon(
+          //             FontAwesomeIcons.google,
+          //             color: Color(0xFF0084ff),
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );
@@ -393,7 +396,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 child: Container(
                   width: 300.0,
-                  height: 320.0,
+                  height: 420.0,
                   child: Column(
                     children: <Widget>[
                       Padding(
@@ -412,6 +415,34 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.black,
                             ),
                             hintText: "Name",
+                            hintStyle: TextStyle(
+                              fontSize: 16.0,
+                              fontFamily: "TitilliumWebBold",
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 250.0,
+                        height: 1.0,
+                        color: Colors.grey[400],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: 15.0, bottom: 15.0, left: 25.0, right: 25.0),
+                        child: TextField(
+                          focusNode: myFocusNodePhone,
+                          controller: signupPhoneController,
+                          keyboardType: TextInputType.phone,
+                          textCapitalization: TextCapitalization.words,
+                          style: TextStyle(fontSize: 16.0, color: Colors.black),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            icon: Icon(
+                              FontAwesomeIcons.mobile,
+                              color: Colors.black,
+                            ),
+                            hintText: "Telephone Number",
                             hintStyle: TextStyle(
                               fontSize: 16.0,
                               fontFamily: "TitilliumWebBold",
@@ -533,7 +564,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 310.0),
+                margin: EdgeInsets.only(top: 410.0),
                 decoration: new BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   color: Colors.black,
@@ -594,21 +625,22 @@ class _LoginScreenState extends State<LoginScreen> {
     FocusScope.of(context).unfocus();
     var email = loginEmailController.text;
     var password = loginPasswordController.text;
-    if (_validateEmail(email) && password.length >= 6) {
-      _loginPressed();
-    } else {
-      Toast.show(
-        "Please enter a valid email and password",
-        context,
-        duration: Toast.LENGTH_LONG,
-        gravity: Toast.BOTTOM,
-      );
-    }
+    _loginPressed();
+    // if (_validateEmail(email) && password.length >= 6) {
+    // } else {
+    //   Toast.show(
+    //     "Please enter a valid email and password",
+    //     context,
+    //     duration: Toast.LENGTH_LONG,
+    //     gravity: Toast.BOTTOM,
+    //   );
+    // }
   }
 
   void _validateCredentialsSignUp() {
     FocusScope.of(context).unfocus();
     var name = signupNameController.text;
+    var phone = signupPhoneController.text;
     var email = signupEmailController.text;
     var password = signupPasswordController.text;
     var passwordConfirm = signupConfirmPasswordController.text;
@@ -619,8 +651,14 @@ class _LoginScreenState extends State<LoginScreen> {
         duration: Toast.LENGTH_LONG,
         gravity: Toast.BOTTOM,
       );
-    }
-    else if(password != passwordConfirm){
+    }else if(phone.length != 10){
+      Toast.show(
+        "Phone number should be 10 digits",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+      );
+    }else if(password != passwordConfirm){
       Toast.show(
         "Passwords do not match",
         context,
@@ -649,39 +687,60 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _loginPressed() async {
+    FirebaseUser user;
+    String errorMessage;
     try {
-      FirebaseAuth.instance
+      AuthResult result = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-              email: loginEmailController.text,
-              password: loginPasswordController.text)
-          .then((AuthResult result) {
-        if (result.user != null) {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/", (Route<dynamic> route) => false);
-        } else {
-          Toast.show(
-            "Your email and password did not match",
-            context,
-            duration: Toast.LENGTH_LONG,
-            gravity: Toast.BOTTOM,
-          );
-        }
-      });
-    } on PlatformException catch (e) {
-      print(e);
-      Toast.show(
-        e.message,
-        context,
-        duration: Toast.LENGTH_LONG,
-        gravity: Toast.BOTTOM,
-      );
-    } catch (e) {
-      print(e);
+            email: "test@gmail.com",
+            password: "123456"
+              // email: loginEmailController.text,
+              // password: loginPasswordController.text
+              );
+      user = result.user;
+      if (user != null) {
+        Navigator.pushNamedAndRemoveUntil(
+        context, "/", (Route<dynamic> route) => false);
+      }
+    } on PlatformException catch (error) {
+      switch (error.code) {
+        case "ERROR_INVALID_EMAIL":
+          errorMessage = "Your email address appears to be malformed.";
+          break;
+        case "ERROR_WRONG_PASSWORD":
+          errorMessage = "Your password is wrong.";
+          break;
+        case "ERROR_USER_NOT_FOUND":
+          errorMessage = "User with this email doesn't exist.";
+          break;
+        case "ERROR_USER_DISABLED":
+          errorMessage = "User with this email has been disabled.";
+          break;
+        case "ERROR_TOO_MANY_REQUESTS":
+          errorMessage = "Too many requests. Try again later.";
+          break;
+        case "ERROR_OPERATION_NOT_ALLOWED":
+          errorMessage = "Signing in with Email and Password is not enabled.";
+          break;
+        default:
+          errorMessage = "An undefined Error happened.";
+      }
+      if(errorMessage != null){
+        Toast.show(
+          errorMessage,
+          context,
+          duration: Toast.LENGTH_LONG,
+          gravity: Toast.BOTTOM,
+        );
+      }
     }
+    
   }
 
   Future<void> _registerPressed() async {
     try {
+      var name = signupNameController.text;
+      var phone = signupPhoneController.text;
       FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: signupEmailController.text,
@@ -689,8 +748,26 @@ class _LoginScreenState extends State<LoginScreen> {
           .then((AuthResult result) {
         if (result.user.uid != null) {
           UserUpdateInfo info = new UserUpdateInfo();
-          info.displayName = signupNameController.text;
-          result.user.updateProfile(info);
+          info.displayName = name;
+          result.user.updateProfile(info).then((onValue){
+            var docRef =
+              Firestore.instance.collection("users").document(result.user.uid);
+              print(result.user.uid);
+              print(docRef);
+            try{
+              Firestore.instance.runTransaction((transaction) async {
+              await transaction
+                  .update(docRef, {
+                    "name": name,
+                    "phone": phone
+                    }).then((data) async {
+                print("updated firebase");
+                });
+              });
+            } catch (updateError) {
+              print("updateError");
+            }
+          });
           //TODO: Load the confirm email screen
           /*Navigator.pushNamedAndRemoveUntil(
               context, "/", (Route<dynamic> route) => false);*/
@@ -701,6 +778,7 @@ class _LoginScreenState extends State<LoginScreen> {
             gravity: Toast.BOTTOM,
           );
           signupNameController.clear();
+          signupPhoneController.clear();
           signupEmailController.clear();
           signupPasswordController.clear();
           signupConfirmPasswordController.clear();
@@ -723,8 +801,6 @@ class _LoginScreenState extends State<LoginScreen> {
         duration: Toast.LENGTH_LONG,
         gravity: Toast.BOTTOM,
       );
-    } catch (e) {
-      print(e);
     }
   }
 

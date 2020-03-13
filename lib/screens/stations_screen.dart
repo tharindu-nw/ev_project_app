@@ -86,7 +86,7 @@ class _StationsScreenState extends State<StationsScreen> {
               descriptionColor: Color(0xFF160F29),
               suffixIcon: Icons.arrow_forward_ios,
               suffixIconColor: Color(0xFF160F29),
-              onTap: () => _openBookingScreen(doc.documentID),
+              onTap: () => _openBookingScreen(doc['name']),
             );
           },
         );

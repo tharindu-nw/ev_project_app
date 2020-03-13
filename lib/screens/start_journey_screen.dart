@@ -43,9 +43,11 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
         child: FutureBuilder(
           future: _getAvailability(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
+            print(snapshot.connectionState);
             switch (snapshot.connectionState) {
               case ConnectionState.done:
                 {
+                  
                   if(snapshot.data.documents.isNotEmpty){
                     return _buildAvailableScreen();
                   }else{
@@ -157,7 +159,7 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
                     padding: EdgeInsets.only(top: 10.0),
                     width: MediaQuery.of(context).size.width * 0.7,
                     child: Text(
-                      "There are bikes available at the dock right now. Clic here to start your journey",
+                      "There are bikes available at the dock right now. Click here to start your journey",
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: "NunitoRegular",
@@ -323,9 +325,10 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
   }
 
   Future<QuerySnapshot> _getAvailability() async {
+    print(widget.stationId);
     var availableQuery = Firestore.instance
         .collection("bicycles")
-        .where("stationId", isEqualTo: widget.stationId)
+        .where("station.name", isEqualTo: widget.stationId)
         .where("availability", isEqualTo: true);
 
     return await availableQuery.getDocuments();
@@ -334,16 +337,19 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
   _bookNow() async {
     var availableQuery = Firestore.instance
         .collection("bicycles")
-        .where("stationId", isEqualTo: widget.stationId)
+        .where("station.name", isEqualTo: widget.stationId)
         .where("availability", isEqualTo: true)
         .limit(1);
 
+    
+
     await availableQuery.getDocuments().then((QuerySnapshot docs) {
+      
       if (docs.documents.isNotEmpty) {
-        myBike = docs.documents[0].documentID;
-
-        var docRef = Firestore.instance.collection("bicycles").document(myBike);
-
+        myBike = docs.documents[0]['bicycleId'];
+        var id = docs.documents[0].documentID;
+        
+        var docRef = Firestore.instance.collection("bicycles").document(id);
         Firestore.instance.runTransaction((transaction) async {
           await transaction.update(docRef, {"availability": false});
         });
@@ -351,7 +357,7 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-              builder: (context) => new BookingScreen(myBike: myBike, credit: widget.credit,),
+              builder: (context) => new BookingScreen(myBike: myBike, credit: widget.credit, bikeId: id,),
             ),
             (Route<dynamic> route) => false);
         // Navigator.push(
