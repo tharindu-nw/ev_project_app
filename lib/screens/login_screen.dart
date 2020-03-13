@@ -57,68 +57,71 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Scaffold(
-        body: NotificationListener<OverscrollIndicatorNotification>(
-          onNotification: (overscroll) {
-            overscroll.disallowGlow();
-          },
-          child: SingleChildScrollView(
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height >= 675.0
-                  ? MediaQuery.of(context).size.height
-                  : 675.0,
-              decoration: BoxDecoration(
-                gradient: CT.ColorTheme.loginGradient,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                //mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    margin: _bigPadding,
-                    child: new Image(
-                      width: 100.0,
-                      height: 100.0,
-                      fit: BoxFit.fill,
-                      image: new AssetImage('assets/img/bicycle_icon.png'),
+    return WillPopScope(
+        onWillPop: () async => false,
+        child: Material(
+        child: Scaffold(
+          body: NotificationListener<OverscrollIndicatorNotification>(
+            onNotification: (overscroll) {
+              overscroll.disallowGlow();
+            },
+            child: SingleChildScrollView(
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height >= 750.0
+                    ? MediaQuery.of(context).size.height
+                    : 750.0,
+                decoration: BoxDecoration(
+                  gradient: CT.ColorTheme.loginGradient,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  //mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      margin: _bigPadding,
+                      child: new Image(
+                        width: 100.0,
+                        height: 100.0,
+                        fit: BoxFit.fill,
+                        image: new AssetImage('assets/img/bicycle_icon.png'),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 20.0),
-                    child: _buildMenuBar(context),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: PageView(
-                      controller: _pageController,
-                      onPageChanged: (i) {
-                        if (i == 0) {
-                          setState(() {
-                            right = Colors.white;
-                            left = Colors.black;
-                          });
-                        } else if (i == 1) {
-                          setState(() {
-                            right = Colors.black;
-                            left = Colors.white;
-                          });
-                        }
-                      },
-                      children: <Widget>[
-                        new ConstrainedBox(
-                          constraints: const BoxConstraints.expand(),
-                          child: _buildSignIn(context),
-                        ),
-                        new ConstrainedBox(
-                          constraints: const BoxConstraints.expand(),
-                          child: _buildSignUp(context),
-                        ),
-                      ],
+                    Padding(
+                      padding: EdgeInsets.only(top: 20.0),
+                      child: _buildMenuBar(context),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      flex: 2,
+                      child: PageView(
+                        controller: _pageController,
+                        onPageChanged: (i) {
+                          if (i == 0) {
+                            setState(() {
+                              right = Colors.white;
+                              left = Colors.black;
+                            });
+                          } else if (i == 1) {
+                            setState(() {
+                              right = Colors.black;
+                              left = Colors.white;
+                            });
+                          }
+                        },
+                        children: <Widget>[
+                          new ConstrainedBox(
+                            constraints: const BoxConstraints.expand(),
+                            child: _buildSignIn(context),
+                          ),
+                          new ConstrainedBox(
+                            constraints: const BoxConstraints.expand(),
+                            child: _buildSignUp(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -625,16 +628,16 @@ class _LoginScreenState extends State<LoginScreen> {
     FocusScope.of(context).unfocus();
     var email = loginEmailController.text;
     var password = loginPasswordController.text;
-    _loginPressed();
-    // if (_validateEmail(email) && password.length >= 6) {
-    // } else {
-    //   Toast.show(
-    //     "Please enter a valid email and password",
-    //     context,
-    //     duration: Toast.LENGTH_LONG,
-    //     gravity: Toast.BOTTOM,
-    //   );
-    // }
+    if (_validateEmail(email) && password.length >= 6) {
+      _loginPressed();
+    } else {
+      Toast.show(
+        "Please enter a valid email and password",
+        context,
+        duration: Toast.LENGTH_LONG,
+        gravity: Toast.BOTTOM,
+      );
+    }
   }
 
   void _validateCredentialsSignUp() {
@@ -692,10 +695,10 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       AuthResult result = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
-            email: "test@gmail.com",
-            password: "123456"
-              // email: loginEmailController.text,
-              // password: loginPasswordController.text
+            // email: "test@gmail.com",
+            // password: "123456"
+            email: loginEmailController.text,
+            password: loginPasswordController.text
               );
       user = result.user;
       if (user != null) {
