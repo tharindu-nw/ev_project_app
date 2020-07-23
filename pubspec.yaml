@@ -21,6 +21,7 @@ dependencies:
   sliding_up_panel: ^0.3.4
   toast: ^0.1.5
   flutter_spinkit: "^4.0.0"
+  flutter_launcher_icons: "^0.7.5"
   shared_preferences: ^0.5.4+5
   intl: ^0.15.8
   cloud_firestore:
