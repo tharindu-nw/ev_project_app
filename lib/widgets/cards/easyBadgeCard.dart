@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ev_app/style/color_theme.dart' as CT;
 
 class EasyBadgeCard extends StatelessWidget {
   final Function onTap;

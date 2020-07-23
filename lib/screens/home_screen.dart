@@ -14,10 +14,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   PanelController _pc = new PanelController();
-  var myBike = null;
+  var myBike;
   var _auth = FirebaseAuth.instance;
-  var _credit = "";
-
+  var _credit;
+  var _minCredit;
+  var _help;
+  final _constID = "BaQFRHA9IanrJojdNRgi";
 
   @override
   void initState() {
@@ -48,6 +50,20 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.only(right: 2.0),
           child: FlatButton(
             child: Text(
+              "Help",
+              style: TextStyle(
+                fontFamily: "TitilliumWebBold",
+                fontSize: 18,
+                color: Colors.white,
+              ),
+            ),
+            onPressed: () => _showHelpDialog(),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 2.0),
+          child: FlatButton(
+            child: Text(
               "Logout",
               style: TextStyle(
                 fontFamily: "TitilliumWebBold",
@@ -70,6 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (overscroll) {
             overscroll.disallowGlow();
+            return false;
           },
           child: SingleChildScrollView(
             child: Container(
@@ -111,22 +128,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   ),
                                   (snapshot.data != null)
-                                  ?
-                                  Text(
-                                    "${snapshot.data}",
-                                    style: TextStyle(
-                                      color: CT.ColorTheme.homeText,
-                                      fontFamily: "NunitoRegular",
-                                      fontSize: 37,
-                                    ),
-                                  ) : Text(
-                                    "There!",
-                                    style: TextStyle(
-                                      color: CT.ColorTheme.homeText,
-                                      fontFamily: "NunitoRegular",
-                                      fontSize: 37,
-                                    ),
-                                  ),
+                                      ? Text(
+                                          "${snapshot.data}",
+                                          style: TextStyle(
+                                            color: CT.ColorTheme.homeText,
+                                            fontFamily: "NunitoRegular",
+                                            fontSize: 37,
+                                          ),
+                                        )
+                                      : Text(
+                                          "There!",
+                                          style: TextStyle(
+                                            color: CT.ColorTheme.homeText,
+                                            fontFamily: "NunitoRegular",
+                                            fontSize: 37,
+                                          ),
+                                        ),
                                 ],
                               );
                             }
@@ -174,18 +191,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(top: 10.0),
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    child: Text(
-                      "Click below to start your next journey",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: "NunitoRegular",
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    )
-                  ),
+                      padding: EdgeInsets.only(top: 10.0),
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: Text(
+                        "Click below to start your next journey",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: "NunitoRegular",
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
+                      )),
                   Container(
                     margin: EdgeInsets.only(top: 30.0),
                     decoration: BoxDecoration(
@@ -216,11 +232,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      onPressed: () => _openStationsScreen(),
+                      onPressed: () => _validateCredit(),
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 40.0),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 30.0, horizontal: 40.0),
                     child: FutureBuilder(
                       future: _getUserData(),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -229,27 +246,29 @@ class _HomeScreenState extends State<HomeScreen> {
                             {
                               return (snapshot.data.documents.isNotEmpty)
                                   ? Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Text(
-                                    "Trips : ${snapshot.data.documents[0].data["trips"].toString()}",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: "NunitoRegular",
-                                      fontSize: 22,
-                                    ),
-                                  ),
-                                  Text(
-                                    "Credit :  ${snapshot.data.documents[0].data["amount"].toString()}",
-                                    style: TextStyle(
-                                      color: CT.ColorTheme.homeText,
-                                      fontFamily: "NunitoRegular",
-                                      fontSize: 22,
-                                    ),
-                                  ),
-                                ],
-                              ) : Container();
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Text(
+                                          "Trips : ${snapshot.data.documents[0].data["trips"].toString()}",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: "NunitoRegular",
+                                            fontSize: 22,
+                                          ),
+                                        ),
+                                        Text(
+                                          "Credit :  ${snapshot.data.documents[0].data["amount"].toString()}",
+                                          style: TextStyle(
+                                            color: CT.ColorTheme.homeText,
+                                            fontFamily: "NunitoRegular",
+                                            fontSize: 22,
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  : Container();
                             }
                           case ConnectionState.waiting:
                             {
@@ -317,21 +336,106 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _validateCredit() {
+    DocumentReference constDoc =
+        Firestore.instance.collection("constants").document(_constID);
+    constDoc.get().then((value) {
+      if (value.exists) {
+        _minCredit = value.data['minFare'];
+        _help = value.data['contact'];
+        print(_minCredit.toString() + " " + _help);
+        if (_credit >= _minCredit) {
+          _openStationsScreen();
+        } else {
+          _showLowCreditDialog();
+        }
+      }
+    });
+  }
+
+  void _showLowCreditDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Low Credit",
+            style: TextStyle(
+                color: CT.ColorTheme.homeText, fontFamily: "NunitoRegular"),
+          ),
+          elevation: 24.0,
+          backgroundColor: CT.ColorTheme.homeBackground,
+          content: Text(
+            "Sorry you seem to be low on credit. You need to have more than $_minCredit credit to start a trip.",
+            style: TextStyle(color: Colors.white, fontFamily: "NunitoRegular"),
+          ),
+          actions: <Widget>[
+            FlatButton(
+                child: new Text(
+                  "Close",
+                  style: TextStyle(
+                      color: CT.ColorTheme.homeText,
+                      fontFamily: "NunitoRegular"),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                })
+          ],
+        );
+      },
+    );
+  }
+
+  void _showHelpDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Contact Us",
+            style: TextStyle(
+                color: CT.ColorTheme.homeText, fontFamily: "NunitoRegular"),
+          ),
+          elevation: 24.0,
+          backgroundColor: CT.ColorTheme.homeBackground,
+          content: Text(
+            "Call: $_help",
+            style: TextStyle(color: Colors.white, fontFamily: "NunitoRegular"),
+          ),
+          actions: <Widget>[
+            FlatButton(
+                child: new Text(
+                  "Close",
+                  style: TextStyle(
+                      color: CT.ColorTheme.homeText,
+                      fontFamily: "NunitoRegular"),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                })
+          ],
+        );
+      },
+    );
+  }
+
   Future<String> _getUserName() async {
     FirebaseUser user = await _auth.currentUser();
     return user.displayName;
   }
 
-  Future<QuerySnapshot> _getUserData()async {
+  Future<QuerySnapshot> _getUserData() async {
     FirebaseUser user = await _auth.currentUser();
     var userQuery = Firestore.instance
         .collection("users")
         .where("email", isEqualTo: user.email);
 
     userQuery.getDocuments().then((QuerySnapshot snapshot) {
-      if(snapshot.documents.isNotEmpty){
+      if (snapshot.documents.isNotEmpty) {
         var user = snapshot.documents[0];
-        _credit = user.data["amount"].toString();
+        _credit = int.parse(user.data["amount"]);
       }
     });
 
@@ -343,13 +447,12 @@ class _HomeScreenState extends State<HomeScreen> {
         context, "/login", (Route<dynamic> route) => false);
   }
 
-  _openStationsScreen(){
+  _openStationsScreen() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => new StationsScreen(credit: _credit),
+        builder: (context) => new StationsScreen(credit: _credit.toString()),
       ),
     );
   }
-
 }

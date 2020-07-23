@@ -1,15 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ev_app/screens/bookings_screen.dart';
 import 'package:ev_app/screens/start_journey_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:ev_app/widgets/cards/easyBadgeCard.dart';
-import 'package:ev_app/widgets/navigation/navbar.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class StationsScreen extends StatefulWidget {
@@ -22,8 +18,7 @@ class StationsScreen extends StatefulWidget {
 
 class _StationsScreenState extends State<StationsScreen> {
   PanelController _pc = new PanelController();
-  var myBike = null;
-  var _auth = FirebaseAuth.instance;
+  var myBike;
 
   @override
   void initState() {
@@ -38,7 +33,7 @@ class _StationsScreenState extends State<StationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Material(
-        child: _buildStationsScreen(),
+      child: _buildStationsScreen(),
     );
   }
 
@@ -86,7 +81,7 @@ class _StationsScreenState extends State<StationsScreen> {
               descriptionColor: Color(0xFF160F29),
               suffixIcon: Icons.arrow_forward_ios,
               suffixIconColor: Color(0xFF160F29),
-              onTap: () => _openBookingScreen(doc['name']),
+              onTap: () => _openStartJourneyScreen(doc['name']),
             );
           },
         );
@@ -102,6 +97,7 @@ class _StationsScreenState extends State<StationsScreen> {
         body: NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (overscroll) {
             overscroll.disallowGlow();
+            return false;
           },
           child: SingleChildScrollView(
             child: Container(
@@ -141,9 +137,8 @@ class _StationsScreenState extends State<StationsScreen> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(top: 10.0),
-                    child: _buildCycleList()
-                  ),
+                      padding: EdgeInsets.only(top: 10.0),
+                      child: _buildCycleList()),
                   /*RichText(
                     text: TextSpan(
                       style: TextStyle(
@@ -206,7 +201,8 @@ class _StationsScreenState extends State<StationsScreen> {
             ),
           ),
         ),
-        panel: Center(  //no longer used
+        panel: Center(
+          //no longer used
           child: Text("Hello!"),
         ),
         backdropEnabled: true,
@@ -228,13 +224,14 @@ class _StationsScreenState extends State<StationsScreen> {
     Navigator.pushNamedAndRemoveUntil(
         context, "/login", (Route<dynamic> route) => false);
   }
-  
-  _openBookingScreen(String stationId) {
+
+  _openStartJourneyScreen(String stationId) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => new StartJourneyScreen(stationId: stationId, credit: widget.credit),
-        ),
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            new StartJourneyScreen(stationId: stationId, credit: widget.credit),
+      ),
     );
   }
 }

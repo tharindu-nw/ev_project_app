@@ -1,14 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ev_app/screens/bookings_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
-import 'package:ev_app/widgets/cards/easyBadgeCard.dart';
-import 'package:ev_app/widgets/navigation/navbar.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class StartJourneyScreen extends StatefulWidget {
@@ -18,14 +14,14 @@ class StartJourneyScreen extends StatefulWidget {
   final String stationId;
   final String credit;
 
-  StartJourneyScreen({@required this.stationId, @required this.credit}) : assert(stationId != null),
-                                                                          assert(credit != null);
+  StartJourneyScreen({@required this.stationId, @required this.credit})
+      : assert(stationId != null),
+        assert(credit != null);
 }
 
 class _StartJourneyScreenState extends State<StartJourneyScreen> {
   PanelController _pc = new PanelController();
-  var myBike = null;
-  var _auth = FirebaseAuth.instance;
+  var myBike;
 
   @override
   void initState() {
@@ -40,42 +36,38 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
   @override
   Widget build(BuildContext context) {
     return Material(
-        child: FutureBuilder(
-          future: _getAvailability(),
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            print(snapshot.connectionState);
-            switch (snapshot.connectionState) {
-              case ConnectionState.done:
-                {
-                  
-                  if(snapshot.data.documents.isNotEmpty){
-                    return _buildAvailableScreen();
-                  }else{
-                    return _buildBookedScreen();
-                  }
-                  break;
-                }
-              case ConnectionState.waiting:
-                {
-                  return SpinKitCubeGrid(
-                    color: CT.ColorTheme.homeText,
-                    size: 50.0,
-                  );
-                }
-              case ConnectionState.active:
-                {
-                  return SpinKitCubeGrid(
-                    color: CT.ColorTheme.homeText,
-                    size: 50.0,
-                  );
-                }
-              default:
-                {
-                  return _buildBookedScreen();
-                }
-            }
-          },
-        ),
+      child: FutureBuilder(
+        future: _getAvailability(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          print(snapshot.connectionState);
+          switch (snapshot.connectionState) {
+            case ConnectionState.done:
+              {
+                return snapshot.data.documents.isNotEmpty
+                    ? _buildAvailableScreen()
+                    : _buildBookedScreen();
+              }
+            case ConnectionState.waiting:
+              {
+                return SpinKitCubeGrid(
+                  color: CT.ColorTheme.homeText,
+                  size: 50.0,
+                );
+              }
+            case ConnectionState.active:
+              {
+                return SpinKitCubeGrid(
+                  color: CT.ColorTheme.homeText,
+                  size: 50.0,
+                );
+              }
+            default:
+              {
+                return _buildBookedScreen();
+              }
+          }
+        },
+      ),
     );
   }
 
@@ -110,6 +102,7 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
         body: NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (overscroll) {
             overscroll.disallowGlow();
+            return false;
           },
           child: SingleChildScrollView(
             child: Container(
@@ -156,18 +149,17 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(top: 10.0),
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    child: Text(
-                      "There are bikes available at the dock right now. Click here to start your journey",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: "NunitoRegular",
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    )
-                  ),
+                      padding: EdgeInsets.only(top: 10.0),
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: Text(
+                        "There are bikes available at the dock right now. Click here to start your journey",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: "NunitoRegular",
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
+                      )),
                   /*RichText(
                     text: TextSpan(
                       style: TextStyle(
@@ -254,6 +246,7 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
       body: NotificationListener<OverscrollIndicatorNotification>(
         onNotification: (overscroll) {
           overscroll.disallowGlow();
+          return false;
         },
         child: SingleChildScrollView(
           child: Container(
@@ -341,14 +334,11 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
         .where("availability", isEqualTo: true)
         .limit(1);
 
-    
-
     await availableQuery.getDocuments().then((QuerySnapshot docs) {
-      
       if (docs.documents.isNotEmpty) {
         myBike = docs.documents[0]['bicycleId'];
         var id = docs.documents[0].documentID;
-        
+
         var docRef = Firestore.instance.collection("bicycles").document(id);
         Firestore.instance.runTransaction((transaction) async {
           await transaction.update(docRef, {"availability": false});
@@ -357,7 +347,11 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-              builder: (context) => new BookingScreen(myBike: myBike, credit: widget.credit, bikeId: id,),
+              builder: (context) => new BookingScreen(
+                myBike: myBike,
+                credit: widget.credit,
+                bikeId: id,
+              ),
             ),
             (Route<dynamic> route) => false);
         // Navigator.push(

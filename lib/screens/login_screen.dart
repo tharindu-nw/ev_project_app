@@ -58,12 +58,13 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: () async => false,
-        child: Material(
+      onWillPop: () async => false,
+      child: Material(
         child: Scaffold(
           body: NotificationListener<OverscrollIndicatorNotification>(
             onNotification: (overscroll) {
               overscroll.disallowGlow();
+              return false;
             },
             child: SingleChildScrollView(
               child: Container(
@@ -647,35 +648,35 @@ class _LoginScreenState extends State<LoginScreen> {
     var email = signupEmailController.text;
     var password = signupPasswordController.text;
     var passwordConfirm = signupConfirmPasswordController.text;
-    if(name.length == 0){
+    if (name.length == 0) {
       Toast.show(
         "Please enter a valid name",
         context,
         duration: Toast.LENGTH_LONG,
         gravity: Toast.BOTTOM,
       );
-    }else if(phone.length != 10){
+    } else if (phone.length != 10) {
       Toast.show(
         "Phone number should be 10 digits",
         context,
         duration: Toast.LENGTH_LONG,
         gravity: Toast.BOTTOM,
       );
-    }else if(password != passwordConfirm){
+    } else if (password != passwordConfirm) {
       Toast.show(
         "Passwords do not match",
         context,
         duration: Toast.LENGTH_LONG,
         gravity: Toast.BOTTOM,
       );
-    }else if(!_validateEmail(email)){
+    } else if (!_validateEmail(email)) {
       Toast.show(
         "Please enter a valid email",
         context,
         duration: Toast.LENGTH_LONG,
         gravity: Toast.BOTTOM,
       );
-    }else if(password.length < 6){
+    } else if (password.length < 6) {
       Toast.show(
         "Password should be longer than 6 characters",
         context,
@@ -693,17 +694,16 @@ class _LoginScreenState extends State<LoginScreen> {
     FirebaseUser user;
     String errorMessage;
     try {
-      AuthResult result = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-            // email: "test@gmail.com",
-            // password: "123456"
-            email: loginEmailController.text,
-            password: loginPasswordController.text
-              );
+      AuthResult result =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+              // email: "test@gmail.com",
+              // password: "123456"
+              email: loginEmailController.text,
+              password: loginPasswordController.text);
       user = result.user;
       if (user != null) {
         Navigator.pushNamedAndRemoveUntil(
-        context, "/", (Route<dynamic> route) => false);
+            context, "/", (Route<dynamic> route) => false);
       }
     } on PlatformException catch (error) {
       switch (error.code) {
@@ -728,7 +728,7 @@ class _LoginScreenState extends State<LoginScreen> {
         default:
           errorMessage = "An undefined Error happened.";
       }
-      if(errorMessage != null){
+      if (errorMessage != null) {
         Toast.show(
           errorMessage,
           context,
@@ -737,7 +737,6 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     }
-    
   }
 
   Future<void> _registerPressed() async {
@@ -752,19 +751,17 @@ class _LoginScreenState extends State<LoginScreen> {
         if (result.user.uid != null) {
           UserUpdateInfo info = new UserUpdateInfo();
           info.displayName = name;
-          result.user.updateProfile(info).then((onValue){
-            var docRef =
-              Firestore.instance.collection("users").document(result.user.uid);
-              print(result.user.uid);
-              print(docRef);
-            try{
+          result.user.updateProfile(info).then((onValue) {
+            var docRef = Firestore.instance
+                .collection("users")
+                .document(result.user.uid);
+            print(result.user.uid);
+            print(docRef);
+            try {
               Firestore.instance.runTransaction((transaction) async {
-              await transaction
-                  .update(docRef, {
-                    "name": name,
-                    "phone": phone
-                    }).then((data) async {
-                print("updated firebase");
+                await transaction.update(
+                    docRef, {"name": name, "phone": phone}).then((data) async {
+                  print("updated firebase");
                 });
               });
             } catch (updateError) {
