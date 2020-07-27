@@ -459,7 +459,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                   TableRow(
                                     children: <Widget>[
                                       Text(
-                                        "Fare",
+                                        "Fare (LKR)",
                                         style: TextStyle(
                                           fontSize: 22,
                                           fontWeight: FontWeight.bold,
@@ -590,7 +590,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                   TableRow(
                                     children: <Widget>[
                                       Text(
-                                        "Fare",
+                                        "Fare (LKR)",
                                         style: TextStyle(
                                           fontSize: 22,
                                           fontWeight: FontWeight.bold,

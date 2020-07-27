@@ -262,8 +262,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       switch (snapshot.connectionState) {
                         case ConnectionState.done:
                           {
-                            _credit =
-                                double.parse(snapshot.data["amount"].toStringAsFixed(2));
+                            _credit = double.parse(
+                                snapshot.data["amount"].toStringAsFixed(2));
                             return (snapshot.hasData)
                                 ? Row(
                                     mainAxisSize: MainAxisSize.max,
@@ -299,8 +299,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         case ConnectionState.active:
                           {
-                            _credit =
-                                double.parse(snapshot.data["amount"].toStringAsFixed(2));
+                            _credit = double.parse(
+                                snapshot.data["amount"].toStringAsFixed(2));
                             return (snapshot.hasData)
                                 ? Row(
                                     mainAxisSize: MainAxisSize.max,
@@ -355,14 +355,19 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _validateCredit() {
-    if (_credit != null && _minCredit != null && _credit >= _minCredit) {
-      _openStationsScreen();
-    } else if (_credit != null && _minCredit != null) {
-      _showLowCreditDialog();
-    } else {
-      //do nothing
-    }
+  Future<void> _validateCredit() async {
+    FirebaseUser user = await _auth.currentUser();
+    var userDocRef = Firestore.instance.collection("users").document(user.uid);
+    userDocRef.get().then((DocumentSnapshot snap) {
+      if (snap.exists) {
+        _credit = double.parse(snap.data["amount"].toStringAsFixed(2));
+        if (_minCredit != null && _credit >= _minCredit) {
+          _openStationsScreen();
+        } else if (_minCredit != null) {
+          _showLowCreditDialog();
+        }
+      }
+    });
   }
 
   void _showLowCreditDialog() {

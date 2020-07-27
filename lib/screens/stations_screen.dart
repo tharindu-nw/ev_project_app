@@ -39,22 +39,7 @@ class _StationsScreenState extends State<StationsScreen> {
     return AppBar(
       elevation: 0,
       backgroundColor: CT.ColorTheme.homeBackground,
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(right: 2.0),
-          child: FlatButton(
-            child: Text(
-              "Logout",
-              style: TextStyle(
-                fontFamily: "TitilliumWebBold",
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
-            onPressed: () => _logout(),
-          ),
-        ),
-      ],
+      actions: <Widget>[],
     );
   }
 
@@ -91,61 +76,56 @@ class _StationsScreenState extends State<StationsScreen> {
     return Scaffold(
       appBar: _buildAppbar(),
       body: NotificationListener<OverscrollIndicatorNotification>(
-          onNotification: (overscroll) {
-            overscroll.disallowGlow();
-            return false;
-          },
-          child: SingleChildScrollView(
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height >= 550.0
-                  ? MediaQuery.of(context).size.height
-                  : 550.0,
-              decoration: BoxDecoration(
-                color: CT.ColorTheme.homeBackground,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(top: 10.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          "Available ",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: "NunitoRegular",
-                            fontSize: 37,
-                          ),
+        onNotification: (overscroll) {
+          overscroll.disallowGlow();
+          return false;
+        },
+        child: SingleChildScrollView(
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height >= 550.0
+                ? MediaQuery.of(context).size.height
+                : 550.0,
+            decoration: BoxDecoration(
+              color: CT.ColorTheme.homeBackground,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        "Available ",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: "NunitoRegular",
+                          fontSize: 37,
                         ),
-                        Text(
-                          "Stations",
-                          style: TextStyle(
-                            color: CT.ColorTheme.homeText,
-                            fontFamily: "NunitoRegular",
-                            fontSize: 37,
-                          ),
+                      ),
+                      Text(
+                        "Stations",
+                        style: TextStyle(
+                          color: CT.ColorTheme.homeText,
+                          fontFamily: "NunitoRegular",
+                          fontSize: 37,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Container(
-                      padding: EdgeInsets.only(top: 10.0),
-                      child: _buildCycleList()),
-                ],
-              ),
+                ),
+                Container(
+                    padding: EdgeInsets.only(top: 10.0),
+                    child: _buildCycleList()),
+              ],
             ),
           ),
         ),
+      ),
     );
-  }
-
-  _logout() {
-    Navigator.pushNamedAndRemoveUntil(
-        context, "/login", (Route<dynamic> route) => false);
   }
 
   _openStartJourneyScreen(String stationId) {

@@ -73,22 +73,7 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
     return AppBar(
       elevation: 0,
       backgroundColor: CT.ColorTheme.homeBackground,
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(right: 2.0),
-          child: FlatButton(
-            child: Text(
-              "Logout",
-              style: TextStyle(
-                fontFamily: "TitilliumWebBold",
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
-            onPressed: () => _logout(),
-          ),
-        ),
-      ],
+      actions: <Widget>[],
     );
   }
 
@@ -291,11 +276,6 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
         ),
       ),
     );
-  }
-
-  _logout() {
-    Navigator.pushNamedAndRemoveUntil(
-        context, "/login", (Route<dynamic> route) => false);
   }
 
   Future<QuerySnapshot> _getAvailability() async {
