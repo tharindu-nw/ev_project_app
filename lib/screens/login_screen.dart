@@ -1,3 +1,4 @@
+import 'package:ev_app/screens/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
@@ -7,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:toast/toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ev_app/services/auth.dart';
 
 final _bigPadding = EdgeInsets.fromLTRB(0.0, 60.0, 0.0, 0.0);
 
@@ -85,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: 100.0,
                         height: 100.0,
                         fit: BoxFit.fill,
-                        image: new AssetImage('assets/img/bicycle_icon.png'),
+                        image: new AssetImage('assets/img/bike_icon.png'),
                       ),
                     ),
                     Padding(
@@ -289,52 +291,49 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           // Padding(
-          //   padding: EdgeInsets.only(top: 5.0),
+          //   padding: EdgeInsets.only(top: 10.0),
           //   child: Row(
           //     mainAxisAlignment: MainAxisAlignment.center,
           //     children: <Widget>[
           //       Container(
-          //         height: 1.0,
-          //         width: 100.0,
           //         decoration: BoxDecoration(
           //           gradient: new LinearGradient(
-          //             colors: [
-          //               Colors.white10,
-          //               Colors.white,
-          //             ],
-          //             stops: [0.0, 1.0],
-          //             begin: const FractionalOffset(0.0, 0.0),
-          //             end: const FractionalOffset(1.0, 1.0),
-          //             tileMode: TileMode.clamp,
-          //           ),
+          //               colors: [
+          //                 Colors.white10,
+          //                 Colors.white,
+          //               ],
+          //               begin: const FractionalOffset(0.0, 0.0),
+          //               end: const FractionalOffset(1.0, 1.0),
+          //               stops: [0.0, 1.0],
+          //               tileMode: TileMode.clamp),
           //         ),
+          //         width: 100.0,
+          //         height: 1.0,
           //       ),
           //       Padding(
-          //         padding: EdgeInsets.symmetric(horizontal: 15.0),
+          //         padding: EdgeInsets.only(left: 15.0, right: 15.0),
           //         child: Text(
           //           "Or",
           //           style: TextStyle(
-          //             fontFamily: "TitilliumWebBold",
-          //             color: Colors.white,
-          //             fontSize: 18.0,
-          //           ),
+          //               color: Colors.white,
+          //               fontSize: 16.0,
+          //               fontFamily: "WorkSansMedium"),
           //         ),
           //       ),
           //       Container(
-          //         height: 1.0,
-          //         width: 100.0,
           //         decoration: BoxDecoration(
           //           gradient: new LinearGradient(
-          //             colors: [
-          //               Colors.white,
-          //               Colors.white10,
-          //             ],
-          //             stops: [0.0, 1.0],
-          //             begin: const FractionalOffset(0.0, 0.0),
-          //             end: const FractionalOffset(1.0, 1.0),
-          //             tileMode: TileMode.clamp,
-          //           ),
+          //               colors: [
+          //                 Colors.white,
+          //                 Colors.white10,
+          //               ],
+          //               begin: const FractionalOffset(0.0, 0.0),
+          //               end: const FractionalOffset(1.0, 1.0),
+          //               stops: [0.0, 1.0],
+          //               tileMode: TileMode.clamp),
           //         ),
+          //         width: 100.0,
+          //         height: 1.0,
           //       ),
           //     ],
           //   ),
@@ -345,7 +344,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //     Padding(
           //       padding: EdgeInsets.only(top: 10.0, right: 40.0),
           //       child: GestureDetector(
-          //         onTap: () {},
+          //         onTap: () => _signInWithFacebook(),
           //         child: Container(
           //           padding: const EdgeInsets.all(15.0),
           //           decoration: new BoxDecoration(
@@ -362,7 +361,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //     Padding(
           //       padding: EdgeInsets.only(top: 10.0),
           //       child: GestureDetector(
-          //         onTap: () {},
+          //         onTap: () => _signInWithGoogle(),
           //         child: Container(
           //           padding: const EdgeInsets.all(15.0),
           //           decoration: new BoxDecoration(
@@ -690,6 +689,15 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _opneHome() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => new HomeScreen(),
+        ),
+        (Route<dynamic> route) => false);
+  }
+
   Future<void> _loginPressed() async {
     FirebaseUser user;
     String errorMessage;
@@ -702,8 +710,12 @@ class _LoginScreenState extends State<LoginScreen> {
               password: loginPasswordController.text);
       user = result.user;
       if (user != null) {
-        Navigator.pushNamedAndRemoveUntil(
-            context, "/", (Route<dynamic> route) => false);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => new HomeScreen(uId: user.uid),
+            ),
+            (Route<dynamic> route) => false);
       }
     } on PlatformException catch (error) {
       switch (error.code) {
@@ -736,6 +748,30 @@ class _LoginScreenState extends State<LoginScreen> {
           gravity: Toast.BOTTOM,
         );
       }
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    FirebaseUser user = await AuthService().signInWithGoogle();
+    if (user != null) {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => new HomeScreen(uId: user.uid,),
+          ),
+          (Route<dynamic> route) => false);
+    }
+  }
+
+  Future<void> _signInWithFacebook() async {
+    FirebaseUser user = await AuthService().signInWithFacebook();
+    if (user != null) {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => new HomeScreen(uId: user.uid,),
+          ),
+          (Route<dynamic> route) => false);
     }
   }
 

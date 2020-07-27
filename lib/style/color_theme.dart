@@ -13,6 +13,7 @@ class ColorTheme {
   static const Color homeBackground = const Color(0xFF2C2C2C);
   static const Color homeText = const Color(0xFF2ED1B2);
   static const Color warningText = const Color(0xFFCB4573);
+  static const Color launchBackground = const Color(0xFFEAE963);
 
   static const loginGradient = LinearGradient(
     colors: [

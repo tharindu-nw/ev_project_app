@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:ev_app/style/color_theme.dart' as CT;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/services.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class StartJourneyScreen extends StatefulWidget {
   @override
@@ -20,7 +19,6 @@ class StartJourneyScreen extends StatefulWidget {
 }
 
 class _StartJourneyScreenState extends State<StartJourneyScreen> {
-  PanelController _pc = new PanelController();
   var myBike;
 
   @override
@@ -97,9 +95,7 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
   Widget _buildAvailableScreen() {
     return Scaffold(
       appBar: _buildAppbar(),
-      body: SlidingUpPanel(
-        controller: _pc,
-        body: NotificationListener<OverscrollIndicatorNotification>(
+      body: NotificationListener<OverscrollIndicatorNotification>(
           onNotification: (overscroll) {
             overscroll.disallowGlow();
             return false;
@@ -222,21 +218,6 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
             ),
           ),
         ),
-        panel: Center(
-          child: Text("Hello!"),
-        ),
-        backdropEnabled: true,
-        minHeight: 0,
-        maxHeight: MediaQuery.of(context).size.height * 0.7,
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24.0), topRight: Radius.circular(24.0)),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black87,
-            blurRadius: 15.0,
-          )
-        ],
-      ),
     );
   }
 
@@ -318,10 +299,9 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
   }
 
   Future<QuerySnapshot> _getAvailability() async {
-    print(widget.stationId);
     var availableQuery = Firestore.instance
         .collection("bicycles")
-        .where("station.name", isEqualTo: widget.stationId)
+        .where("stationId", isEqualTo: widget.stationId)
         .where("availability", isEqualTo: true);
 
     return await availableQuery.getDocuments();
@@ -330,13 +310,12 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
   _bookNow() async {
     var availableQuery = Firestore.instance
         .collection("bicycles")
-        .where("station.name", isEqualTo: widget.stationId)
+        .where("stationId", isEqualTo: widget.stationId)
         .where("availability", isEqualTo: true)
         .limit(1);
 
     await availableQuery.getDocuments().then((QuerySnapshot docs) {
       if (docs.documents.isNotEmpty) {
-        myBike = docs.documents[0]['bicycleId'];
         var id = docs.documents[0].documentID;
 
         var docRef = Firestore.instance.collection("bicycles").document(id);
@@ -348,8 +327,7 @@ class _StartJourneyScreenState extends State<StartJourneyScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => new BookingScreen(
-                myBike: myBike,
-                credit: widget.credit,
+                onTrip: false,
                 bikeId: id,
               ),
             ),

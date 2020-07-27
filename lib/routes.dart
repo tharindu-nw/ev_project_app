@@ -1,10 +1,10 @@
+import 'package:ev_app/screens/landing_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
-import 'screens/home_screen.dart';
 
 class Routes {
   var routes = <String, WidgetBuilder>{
-    "/": (BuildContext context) => new HomeScreen(),
+    "/": (BuildContext context) => new LandingScreen(),
     // "/available": (BuildContext context) => new StartJourneyScreen(),
     // "/bookings": (BuildContext context) => new BookingScreen(),
     "/login": (BuildContext context) => new LoginScreen(),
@@ -18,7 +18,7 @@ class Routes {
         theme: ThemeData(
           fontFamily: "TitilliumWebReg",
         ),
-        initialRoute: "/login",
+        initialRoute: "/",
         routes: routes,
       ),
     );

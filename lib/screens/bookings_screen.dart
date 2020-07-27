@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ev_app/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,46 +14,48 @@ class BookingScreen extends StatefulWidget {
   @override
   _BookingScreenState createState() => _BookingScreenState();
 
-  final String myBike;
-  final String credit;
+  final bool onTrip;
   final String bikeId;
 
-  BookingScreen(
-      {@required this.myBike, @required this.credit, @required this.bikeId})
-      : assert(myBike != null),
-        assert(bikeId != null),
-        assert(credit != null);
+  BookingScreen({@required this.onTrip, @required this.bikeId})
+      : assert(bikeId != null),
+        assert(onTrip != null);
 }
 
 class _BookingScreenState extends State<BookingScreen> {
-  final _constID = "BaQFRHA9IanrJojdNRgi";
   var bike;
-  var _unitPrice;
+  var _fare;
 
   var lockRequestSent = false;
   var isButtonVisible = true;
   var isTripStarted = false;
   var isTripFinished = false;
+  var isFareReceived = false;
+
+  var startTimeReceived;
 
   var _startTime = "-- : -- : --";
   var _endTime;
   DateTime _startTimeStamp;
   DateTime _endTimeStamp;
   var _duration;
+  var _tripId;
 
   var cardHeight = 380;
 
   @override
   void initState() {
     super.initState();
+    if (widget.onTrip) {
+      _getCurrentTripDetails();
+    }
   }
 
   _getBikeDetails() async {
-    var availableQuery = Firestore.instance
-        .collection("bicycles")
-        .where("bicycleId", isEqualTo: widget.myBike);
+    var availableQuery =
+        Firestore.instance.collection("bicycles").document(widget.bikeId);
 
-    return await availableQuery.getDocuments();
+    return await availableQuery.get();
   }
 
   @override
@@ -75,7 +79,9 @@ class _BookingScreenState extends State<BookingScreen> {
                 decoration: BoxDecoration(
                   color: CT.ColorTheme.homeBackground,
                 ),
-                child: lockRequestSent ? _buildLoading() : _buildBookings(),
+                child: widget.onTrip
+                    ? _buildLoading()
+                    : (lockRequestSent ? _buildLoading() : _buildBookings()),
               ),
             ),
           ),
@@ -106,22 +112,24 @@ class _BookingScreenState extends State<BookingScreen> {
               child: StreamBuilder(
                 stream: Firestore.instance
                     .collection("bicycles")
-                    .where("bicycleId", isEqualTo: widget.myBike)
+                    .document(widget.bikeId)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) return const Text("Loading...");
                   return ListView.builder(
                     shrinkWrap: true,
                     padding: const EdgeInsets.all(8.0),
-                    itemCount: snapshot.data.documents.length,
+                    itemCount: 1,
                     itemBuilder: (BuildContext context, int index) {
-                      DocumentSnapshot doc = snapshot.data.documents[index];
+                      DocumentSnapshot doc = snapshot.data;
                       if (doc['locked'] == true &&
                           doc['unlocking'] == true &&
                           doc['secretKey'] == null) {
-                        return SpinKitCubeGrid(
-                          color: CT.ColorTheme.homeText,
-                          size: 50.0,
+                        return Center(
+                          child: SpinKitCubeGrid(
+                            color: CT.ColorTheme.homeText,
+                            size: 50.0,
+                          ),
                         );
                       }
                       if (doc['locked'] == true &&
@@ -154,7 +162,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                   elevation: 8,
                                   highlightElevation: 2,
                                   splashColor: Colors.white54,
-                                  onPressed: () => _finishTrip(false),
+                                  onPressed: () => _finishTrip(),
                                   child: Text(
                                     "Go Back",
                                     style: TextStyle(
@@ -182,7 +190,7 @@ class _BookingScreenState extends State<BookingScreen> {
                               ),
                             ),
                             Text(
-                              "Bike ${widget.myBike}",
+                              "${doc["bicycleName"]}",
                               style: TextStyle(
                                 fontFamily: "TitilliumWebBold",
                                 fontSize: 30,
@@ -197,7 +205,7 @@ class _BookingScreenState extends State<BookingScreen> {
                               ),
                             ),
                             Text(
-                              "${snapshot.data.documents[0]["secretKey"]}",
+                              "${doc["secretKey"]}",
                               style: TextStyle(
                                 fontFamily: "TitilliumWebBold",
                                 fontSize: 40,
@@ -215,11 +223,12 @@ class _BookingScreenState extends State<BookingScreen> {
                           ],
                         );
                       } else if (doc['locked'] == false &&
-                          doc['unlocking'] == false) {
+                          doc['unlocking'] == false &&
+                          !widget.onTrip) {
                         isTripStarted = true;
-                        //lockRequestSent = false;
                         _startTime = DateFormat.jm().format(new DateTime.now());
                         _startTimeStamp = DateTime.now();
+                        _tripId = doc['currentTripId'];
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
@@ -231,7 +240,88 @@ class _BookingScreenState extends State<BookingScreen> {
                               ),
                             ),
                             Text(
-                              "Bike ${snapshot.data.documents[0]["bicycleId"]}",
+                              "${doc["bicycleName"]}",
+                              style: TextStyle(
+                                fontFamily: "TitilliumWebBold",
+                                fontSize: 30,
+                                color: CT.ColorTheme.homeText,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 16.0, bottom: 16.0),
+                              child: Table(
+                                defaultColumnWidth: FlexColumnWidth(),
+                                children: <TableRow>[
+                                  TableRow(
+                                    children: <Widget>[
+                                      Text(
+                                        "Start time",
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        _startTime,
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 22,
+                                            fontFamily: "TitilliumWebBold",
+                                            color: CT.ColorTheme.homeText),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              "Your trip has started",
+                              style: TextStyle(
+                                  fontFamily: "TitilliumWebBold",
+                                  fontSize: 24,
+                                  color: CT.ColorTheme.loginGradientStart),
+                            ),
+                            Text(
+                              "Lock the bike into the station at the end of your trip to finish",
+                              style: TextStyle(
+                                fontFamily: "TitilliumWebBold",
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
+                        );
+                      } else if (doc['locked'] == false &&
+                          doc['unlocking'] == false &&
+                          widget.onTrip &&
+                          startTimeReceived != null &&
+                          !startTimeReceived) {
+                        isTripStarted = true;
+                        return Center(
+                          child: SpinKitCubeGrid(
+                            color: CT.ColorTheme.homeText,
+                            size: 50.0,
+                          ),
+                        );
+                      } else if (doc['locked'] == false &&
+                          doc['unlocking'] == false &&
+                          widget.onTrip &&
+                          startTimeReceived != null &&
+                          startTimeReceived) {
+                        isTripStarted = true;
+                        _tripId = doc['currentTripId'];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              "You have Booked",
+                              style: TextStyle(
+                                fontFamily: "TitilliumWebBold",
+                                fontSize: 20,
+                              ),
+                            ),
+                            Text(
+                              "${doc["bicycleName"]}",
                               style: TextStyle(
                                 fontFamily: "TitilliumWebBold",
                                 fontSize: 30,
@@ -284,9 +374,11 @@ class _BookingScreenState extends State<BookingScreen> {
                         );
                       } else if (doc['locked'] == true &&
                           doc['unlocking'] == false &&
-                          isTripStarted) {
-                        _endTime = DateFormat.jm().format(new DateTime.now());
+                          isTripStarted &&
+                          !isFareReceived) {
                         _endTimeStamp = DateTime.now();
+                        _endTime = DateFormat.jm().format(_endTimeStamp);
+                        _requestFare();
                         _duration =
                             _endTimeStamp.difference(_startTimeStamp).inMinutes;
                         isTripStarted = false;
@@ -374,12 +466,13 @@ class _BookingScreenState extends State<BookingScreen> {
                                         ),
                                       ),
                                       Text(
-                                        "LKR ${_duration * _unitPrice}",
+                                        "Receiving...",
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
-                                            fontSize: 22,
+                                            fontSize: 18,
                                             fontFamily: "TitilliumWebBold",
-                                            color: CT.ColorTheme.homeText),
+                                            color: CT
+                                                .ColorTheme.bookingGradientEnd),
                                       ),
                                     ],
                                   ),
@@ -402,7 +495,140 @@ class _BookingScreenState extends State<BookingScreen> {
                                     elevation: 8,
                                     highlightElevation: 2,
                                     splashColor: Colors.white54,
-                                    onPressed: () => _finishTrip(true),
+                                    onPressed: () => _finishTrip(),
+                                    child: Text(
+                                      "Finish",
+                                      style: TextStyle(
+                                        fontFamily: "TitilliumWebBold",
+                                        color: Colors.white,
+                                        fontSize: 25.0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      } else if (doc['locked'] == true &&
+                          doc['unlocking'] == false &&
+                          isTripFinished &&
+                          isFareReceived) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              "Your trip has finished",
+                              style: TextStyle(
+                                fontFamily: "TitilliumWebBold",
+                                fontSize: 20,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 16.0, bottom: 16.0),
+                              child: Table(
+                                defaultColumnWidth: FlexColumnWidth(),
+                                children: <TableRow>[
+                                  TableRow(
+                                    children: <Widget>[
+                                      Text(
+                                        "Start time",
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        _startTime,
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 22,
+                                            fontFamily: "TitilliumWebBold",
+                                            color: CT.ColorTheme.homeText),
+                                      ),
+                                    ],
+                                  ),
+                                  TableRow(
+                                    children: <Widget>[
+                                      Text(
+                                        "End time",
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        _endTime,
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 22,
+                                            fontFamily: "TitilliumWebBold",
+                                            color: CT.ColorTheme.homeText),
+                                      ),
+                                    ],
+                                  ),
+                                  TableRow(
+                                    children: <Widget>[
+                                      Text(
+                                        "Duration",
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        "$_duration Min",
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 22,
+                                            fontFamily: "TitilliumWebBold",
+                                            color: CT.ColorTheme.homeText),
+                                      ),
+                                    ],
+                                  ),
+                                  TableRow(
+                                    children: <Widget>[
+                                      Text(
+                                        "Fare",
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        _fare == "Error"
+                                            ? "Error"
+                                            : "${_fare.toStringAsFixed(2)}",
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            fontSize: 22,
+                                            fontFamily: "TitilliumWebBold",
+                                            color: CT
+                                                .ColorTheme.bookingGradientEnd),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Visibility(
+                              visible: isTripFinished,
+                              child: Container(
+                                margin: EdgeInsets.only(top: 20.0),
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                  width: 175,
+                                  height: 60,
+                                  child: RaisedButton(
+                                    color: CT.ColorTheme.loginGradientStart,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(27.0)),
+                                    elevation: 8,
+                                    highlightElevation: 2,
+                                    splashColor: Colors.white54,
+                                    onPressed: () => _finishTrip(),
                                     child: Text(
                                       "Finish",
                                       style: TextStyle(
@@ -418,9 +644,11 @@ class _BookingScreenState extends State<BookingScreen> {
                           ],
                         );
                       } else {
-                        return SpinKitCubeGrid(
-                          color: CT.ColorTheme.homeText,
-                          size: 50.0,
+                        return Center(
+                          child: SpinKitCubeGrid(
+                            color: CT.ColorTheme.homeText,
+                            size: 50.0,
+                          ),
                         );
                       }
                     },
@@ -470,7 +698,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                 ),
                               ),
                               Text(
-                                "Bike ${snapshot.data.documents[0]["bicycleId"]}",
+                                "${snapshot.data["bicycleName"]}",
                                 style: TextStyle(
                                   fontFamily: "TitilliumWebBold",
                                   fontSize: 30,
@@ -578,7 +806,7 @@ class _BookingScreenState extends State<BookingScreen> {
                             elevation: 8,
                             highlightElevation: 2,
                             splashColor: Colors.white54,
-                            onPressed: () => _finishTrip(false),
+                            onPressed: () => _finishTrip(),
                             child: Text(
                               "Finish Trip",
                               style: TextStyle(
@@ -596,16 +824,20 @@ class _BookingScreenState extends State<BookingScreen> {
               }
             case ConnectionState.waiting:
               {
-                return SpinKitCubeGrid(
-                  color: CT.ColorTheme.homeText,
-                  size: 50.0,
+                return Center(
+                  child: SpinKitCubeGrid(
+                    color: CT.ColorTheme.homeText,
+                    size: 50.0,
+                  ),
                 );
               }
             case ConnectionState.active:
               {
-                return SpinKitCubeGrid(
-                  color: CT.ColorTheme.homeText,
-                  size: 50.0,
+                return Center(
+                  child: SpinKitCubeGrid(
+                    color: CT.ColorTheme.homeText,
+                    size: 50.0,
+                  ),
                 );
               }
             default:
@@ -653,12 +885,7 @@ class _BookingScreenState extends State<BookingScreen> {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => new HomeScreen(),
-                              ),
-                              (Route<dynamic> route) => false);
+                          _goBackToHome();
                         },
                       ),
                     )
@@ -672,27 +899,54 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 
   _cancelPressed() {
-    _finishTrip(false);
+    _finishTrip();
   }
 
-  _goBackToHome() {
+  _goBackToHome() async {
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => new HomeScreen(),
+          builder: (context) => new HomeScreen(
+            uId: user.uid,
+          ),
         ),
         (Route<dynamic> route) => false);
   }
 
-  _lockUnlockBike(bool locked) {
-    //call the function to get unit price
-    _getUnitPrice();
+  _getCurrentTripDetails() async {
+    startTimeReceived = false;
+    final bikeQuery =
+        Firestore.instance.collection("bicycles").document(widget.bikeId);
+    bikeQuery.get().then((DocumentSnapshot snap) {
+      if (snap.data.isNotEmpty) {
+        var tripId = snap.data["currentTripId"];
+        final tripQuery =
+            Firestore.instance.collection("trips").document(tripId);
+        tripQuery.get().then((DocumentSnapshot snap2) {
+          if (snap2.data.isNotEmpty) {
+            var timeEpoch = snap2.data['startTime'];
+            _startTimeStamp = DateTime.fromMillisecondsSinceEpoch(timeEpoch);
+            _startTime = DateFormat.jm().format(_startTimeStamp);
+            startTimeReceived = true;
+            setState(() {});
+          }
+        });
+      }
+    });
+  }
+
+  _lockUnlockBike(bool locked) async {
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    final userId = user.uid;
 
     var docRef =
         Firestore.instance.collection("bicycles").document(widget.bikeId);
 
     Firestore.instance.runTransaction((transaction) async {
-      await transaction.update(docRef, {"unlocking": true}).then((data) async {
+      await transaction
+          .update(docRef, {"unlocking": true, "currentUserId": userId}).then(
+              (data) async {
         lockRequestSent = true;
         isTripStarted = false;
         isButtonVisible = false;
@@ -701,46 +955,30 @@ class _BookingScreenState extends State<BookingScreen> {
     });
   }
 
-  _getUnitPrice() {
-    DocumentReference constDoc =
-        Firestore.instance.collection("constants").document(_constID);
-    constDoc.get().then((value) {
-      if (value.exists) {
-        _unitPrice = value.data['unitPrice'];
-      }
-    });
-  }
-
-  _finishTrip(bool tripDone) {
+  _finishTrip() {
     var docRef =
         Firestore.instance.collection("bicycles").document(widget.bikeId);
     Firestore.instance.runTransaction((transaction) async {
-      await transaction
-          .update(docRef, {"availability": true, "secretKey": null});
+      await transaction.update(docRef, {"availability": true});
     }).then((onValue) {
-      if (tripDone) {
-        _updateTripFare();
-      } else {
-        _goBackToHome();
-      }
+      _goBackToHome();
     });
   }
 
-  _updateTripFare() async {
-    FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    final userId = user.uid;
-    if (_duration != null && _unitPrice != null) {
-      final cost = _duration * _unitPrice;
-      final url =
-          "https://us-central1-ev-firestore-2019.cloudfunctions.net/onTripFinish?userId=$userId&cost=$cost";
-      final response = await http.post(url);
-      if (response.statusCode == 200) {
-        _goBackToHome();
-      } else {
-        _goBackToHome();
-      }
+  _requestFare() async {
+    final url =
+        "https://us-central1-ev-firestore-2019.cloudfunctions.net/getTrip?tripId=$_tripId";
+
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      _fare = result['tripCost'];
+      isFareReceived = true;
+      setState(() {});
     } else {
-      _goBackToHome();
+      _fare = "Error";
+      isFareReceived = true;
+      setState(() {});
     }
   }
 }

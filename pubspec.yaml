@@ -18,14 +18,15 @@ environment:
 
 dependencies:
   firebase_auth: ^0.14.0+5
-  sliding_up_panel: ^0.3.4
   toast: ^0.1.5
   flutter_spinkit: "^4.0.0"
   flutter_launcher_icons: "^0.7.5"
-  shared_preferences: ^0.5.4+5
   intl: ^0.15.8
   http: ^0.12.2
-  cloud_firestore:
+  cloud_firestore: ^0.13.7
+  google_sign_in: ^4.5.1
+  flutter_facebook_login: ^2.0.1
+  rxdart: ^0.22.6
   flutter:
     sdk: flutter
 
@@ -64,6 +65,7 @@ flutter:
     - assets/img/circle.png
     - assets/img/home_bike.png
     - assets/img/home_walk.png
+    - assets/img/bike_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
