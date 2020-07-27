@@ -262,6 +262,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       switch (snapshot.connectionState) {
                         case ConnectionState.done:
                           {
+                            _credit =
+                                double.parse(snapshot.data["amount"].toStringAsFixed(2));
                             return (snapshot.hasData)
                                 ? Row(
                                     mainAxisSize: MainAxisSize.max,
@@ -297,6 +299,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         case ConnectionState.active:
                           {
+                            _credit =
+                                double.parse(snapshot.data["amount"].toStringAsFixed(2));
                             return (snapshot.hasData)
                                 ? Row(
                                     mainAxisSize: MainAxisSize.max,
